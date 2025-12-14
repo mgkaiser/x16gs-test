@@ -1,0 +1,21 @@
+MEMORY {            
+    GOLDEN:         start = $0400,      size = $0400, define = yes;                    
+    LOADADDR:       start = $07ff,      size = $0002, fill = yes, fillval = $00;  
+    STARTUP:        start = $0801,      size = $000f, fill = yes, fillval = $00;
+    MAIN:           start = $0810,      size = $8FF0;    
+    STACK:          start = $9700,      size = $0800, define = yes;        
+    BANKS:          start = $a000,      size = $2000, define = yes;  
+    OVERLAY1:       start = $100000,    size = $ffff, file="@BUILD_DIR@/@OVERLAY1_ROOT@.bin";  
+    OVERLAY2:       start = $110000,    size = $ffff, file="@BUILD_DIR@/@OVERLAY2_ROOT@.bin";  
+}
+
+SEGMENTS {                
+    GOLDEN:         load = GOLDEN,          type = bss;    
+    LOADADDR:       load = LOADADDR,        type = ro;
+    STARTUP:        load = STARTUP,         type = ro;
+    MAIN:           load = MAIN,            type = ro; 
+    STACK:          load = STACK,           type = bss;
+    BANKS:          load = BANKS,           type = bss;  
+    OVERLAY1:       load = OVERLAY1,        type = ro;
+    OVERLAY2:       load = OVERLAY2,        type = ro;         
+}
