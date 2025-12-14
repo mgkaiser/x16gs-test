@@ -51,6 +51,10 @@ install: all
 	cp $(BUILD_DIR)/$(OVERLAY1_ROOT).bin $(EMU_DIR1)/$(OVERLAY1_ROOT).bin
 	cp $(BUILD_DIR)/$(OVERLAY2_ROOT).bin $(EMU_DIR1)/$(OVERLAY2_ROOT).bin
 
+test: install
+	@echo "Starting X16 Emulator..."
+	x16emu -gs -scale 2 -quality linear -fsroot $(EMU_DIR1) -rtc -debug -prg $(MAIN_BIN) -run	
+
 # Clean target
 clean:
 	rm -rf $(BUILD_DIR)
