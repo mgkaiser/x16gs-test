@@ -30,10 +30,10 @@
     ; Setup stack frame
     SetupStackFrame    
 
-    ; Create the file Handle
+    ; Create the file Handle    
     lda lfn
     ldx dev
-    ldy snd
+    ldy snd    
     jsl setlfs_far    
 
     ; If HIWORD of FileName Pointer isn't $0000 copy it to bank $00  

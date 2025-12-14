@@ -12,7 +12,7 @@
 
 ; Define symbolic constants
 OVERLAY1_LOAD_ADDR  = $100000
-OVERLAY2_LOAD_ADDR   = $110000
+OVERLAY2_LOAD_ADDR  = $110000
 MALLOC_START        = $010000
 MALLOC_SIZE	        = $040000
 BUFFER_SIZE         = 32
@@ -31,13 +31,14 @@ BUFFER_SIZE         = 32
     ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
 
     ; Setup stack frame
-    SetupStackFrame   
+    SetupStackFrame       
     
     ; Load the overlays
     Load #1, #8, #0, #overlay1_filename, #OVERLAY1_LOAD_ADDR
     Load #1, #8, #0, #overlay2_filename, #OVERLAY2_LOAD_ADDR
     
     ; Initialize the malloc system
+    breakpoint
     FarMalloc_Init
     FarMalloc_AddBlock #MALLOC_START, #MALLOC_SIZE	    
 
@@ -48,8 +49,6 @@ BUFFER_SIZE         = 32
 
     ; Convert result to PETSCII
     ToHexL l_p, buffer    
-
-    breakpoint
 
     ; Print it
     Print #buffer

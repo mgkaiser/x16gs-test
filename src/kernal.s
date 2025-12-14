@@ -48,7 +48,7 @@ kernal_fn:  .res 32
     txa
     sta registers + registers::x_reg    
     tya 
-    sta registers + registers::a_reg    
+    sta registers + registers::y_reg    
     lda #SETNAM    
     sta registers + registers::kernal_call
     jmp call_kernal                                    
@@ -59,7 +59,7 @@ kernal_fn:  .res 32
     txa
     sta registers + registers::x_reg    
     tya 
-    sta registers + registers::a_reg    
+    sta registers + registers::y_reg    
     lda #SETLFS    
     sta registers + registers::kernal_call
     jmp call_kernal                                    

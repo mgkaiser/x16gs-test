@@ -6,7 +6,7 @@
 .include "kernalstruct.inc"
 .include "kernal.inc"
 
-.segment "MAIN"
+.segment "OVERLAY1"
 
 ; Define exports for all public functions in this module
 .export tohex
@@ -47,7 +47,7 @@ tohex_loop:
 
         ; Convert the digit to ascii and store at pointer
         mode8
-        lda hextemplate,X
+        lda f:hextemplate,X
         sta [ptr],y
         mode16
         

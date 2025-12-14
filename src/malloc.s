@@ -4,8 +4,6 @@
 
 .include "mac.inc"
 
-.segment "MAIN"
-
 ; Define exports for all public functions in this module
 .export farmalloc_init
 .export farmalloc_addblock
@@ -61,6 +59,8 @@
 
 .segment "MAIN"
 pm: .res .sizeof(pmalloc)
+
+.segment "OVERLAY1"
 
 .proc farmalloc_init: far
 
