@@ -10,6 +10,13 @@
 
 .segment "MAIN"
 
+; Define symbolic constants
+OVERLAY1_LOAD_ADDR  = $100000
+OVERLAY2_LOAD_ADDR   = $110000
+MALLOC_START        = $010000
+MALLOC_SIZE	        = $040000
+BUFFER_SIZE         = 32
+
 .proc main: near
 
     ; Save working registers
@@ -26,12 +33,13 @@
     ; Setup stack frame
     SetupStackFrame   
     
-    Load #1, #8, #0, #overlay1_filename, #$100000
-    Load #1, #8, #0, #overlay2_filename, #$110000
+    ; Load the overlays
+    Load #1, #8, #0, #overlay1_filename, #OVERLAY1_LOAD_ADDR
+    Load #1, #8, #0, #overlay2_filename, #OVERLAY2_LOAD_ADDR
     
     ; Initialize the malloc system
     FarMalloc_Init
-    FarMalloc_AddBlock #$010000, #$040000    
+    FarMalloc_AddBlock #MALLOC_START, #MALLOC_SIZE	    
 
     ; Test Farmalloc    
     FarMalloc #$000400
@@ -55,10 +63,12 @@
 
 .endproc
 
+; Workspace to hold converted hex string
 buffer: 
-    .repeat 32
+    .repeat BUFFER_SIZE
         .byte $00
     .endrepeat
 
+; String Constants
 overlay1_filename: .byte "X16GS-TEST.OV1.BIN", $00
 overlay2_filename: .byte "X16GS-TEST.OV2.BIN", $00
