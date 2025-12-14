@@ -24,3 +24,4 @@ x16emu -gs -scale 2 -quality linear -fsroot /mnt/c/x16emu_win64-r49/drive -rtc -
     * DLL must fit entirely within 64k
     * All calls to DLL must be far calls
     * DLL loader must create a table of function pointers at it's load address so you effectively "JSL[{LoadAddress}],X" where X = function Number
+# x16gs-test
