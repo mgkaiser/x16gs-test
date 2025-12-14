@@ -71,17 +71,14 @@ load_count_exit:
 
     ; Set the filename
     mode8    
-    tya
-    sta registers + registers::a_reg
-    lda l_p_temp
-    sta registers + registers::x_reg
-    lda l_p_temp+1
-    sta registers + registers::y_reg    
+    tya    
+    ldx l_p_temp    
+    ldy l_p_temp+1    
     mode16
-    CallKernal SETNAM
+    jsl setnam_far    
 
     ; Open the file 
-    CallKernal OPEN
+    jsl open_far    
 
     ; Load the file here
     lda address
@@ -91,12 +88,11 @@ load_count_exit:
     HBLoad
 
     ; Clear the channel
-    CallKernal CLRCHN
+    jsl clrchn_far
 
     ; Close the file handle
-    lda lfn
-    sta registers + registers::a_reg
-    CallKernal CLOSE
+    lda lfn    
+    jsl close_far    
 
     FreeLocals  
     ProcSuffix

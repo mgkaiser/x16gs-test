@@ -7,6 +7,8 @@
 .segment "MAIN"
 .segment "LOADADDR"
 .segment "STARTUP"
+.segment "OVERLAY1"
+.segment "OVERLAY2"
 
 .macro SetRomBank bank
 	mode8

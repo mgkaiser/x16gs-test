@@ -13,12 +13,46 @@
 .export call_kernal
 .export bsout_far: far 
 .export setlfs_far: far
+.export setnam_far: far
+.export open_far: far
+.export clrchn_far: far
+.export close_far: far
 
 ; A place to store registers for Kernal calls
 registers:  .res .sizeof(registers)
 
 ; A place to store the filename in bank $00 for kernal calls
 kernal_fn:  .res 32
+
+.proc close_far : far
+    sta registers + registers::a_reg    
+    lda #CLOSE    
+    sta registers + registers::kernal_call
+    jmp call_kernal                                    
+.endproc
+
+.proc clrchn_far : far
+    lda #CLRCHN
+    sta registers + registers::kernal_call
+    jmp call_kernal                                    
+.endproc
+
+.proc open_far : far
+    lda #OPEN
+    sta registers + registers::kernal_call
+    jmp call_kernal                                    
+.endproc
+
+.proc setnam_far : far
+    sta registers + registers::a_reg    
+    txa
+    sta registers + registers::x_reg    
+    tya 
+    sta registers + registers::a_reg    
+    lda #SETNAM    
+    sta registers + registers::kernal_call
+    jmp call_kernal                                    
+.endproc
 
 .proc setlfs_far : far
     sta registers + registers::a_reg    
