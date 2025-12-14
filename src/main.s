@@ -8,9 +8,6 @@
 .include "file.inc"
 .include "basicstub.inc"    ; ONLY include this in main.s.  MUST be last include
 
-.import overlay1_signature
-.import overlay2_signature
-
 .segment "MAIN"
 
 .proc main: near
