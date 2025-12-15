@@ -202,7 +202,7 @@ pm: .res .sizeof(pmalloc)
     
     ; Add it to the available heap
     FarMalloc_Item_Insert pm + pmalloc::available, ptr    
-    FarMalloc_Chain_Dump pm + pmalloc::available, #malloc_available_str
+    ;FarMalloc_Chain_Dump pm + pmalloc::available, #malloc_available_str
     
     ; Update totalnodes "l_p_pm->totalnode++"    
     clc
@@ -296,7 +296,7 @@ farmalloc_loop_found:
     ; Remove it from available
     FarMalloc_Item_Remove pm + pmalloc::available, l_p_current       
 
-    ; Add it to assigned
+    ; Add it to assigned    
     FarMalloc_Item_Insert pm + pmalloc::assigned,  l_p_current    
     
     ; if (current->pmalloc_item::size == size) { ... }
@@ -424,8 +424,8 @@ malloc_skip_split:
         
 farmalloc_exit:
 
-    FarMalloc_Chain_Dump pm + pmalloc::available, #malloc_available_str
-    FarMalloc_Chain_Dump pm + pmalloc::assigned, #malloc_assigned_str
+    ;FarMalloc_Chain_Dump pm + pmalloc::available, #malloc_available_str
+    ;FarMalloc_Chain_Dump pm + pmalloc::assigned, #malloc_assigned_str
 
     ; Exit the procedure
     FreeLocals
@@ -450,7 +450,7 @@ farmalloc_exit:
     DeclareParam ptr, 0                                     ; uint32_t ptr                                 
 
     ; Setup stack frame
-    SetupStackFrame  
+    SetupStackFrame      
 
     ;if (ptr == NULL) return;
     lda ptr
@@ -466,9 +466,9 @@ farmalloc_exit:
     sbc #.HIWORD(.sizeof(pmalloc_item))
     sta l_node+2
 
-    ; Remove it from pm->assigned        
+    ; Remove it from pm->assigned          
     FarMalloc_Item_Remove pm + pmalloc::assigned, l_node    
-    FarMalloc_Chain_Dump pm + pmalloc::assigned, #malloc_assigned_str
+    ;FarMalloc_Chain_Dump pm + pmalloc::assigned, #malloc_assigned_str    
     
     ; Store a pointer to pm in l_p_pm (a local variable in DP)
     lda #.LOWORD(pm)
@@ -490,9 +490,10 @@ farmalloc_exit:
     ldy #pmalloc::freemem+2
     sta (l_p_pm),y
 
-    ; Add it from pm->available    
+    ; Add it from pm->available            
     FarMalloc_Item_Insert pm + pmalloc::available, l_node    
-
+    ;FarMalloc_Chain_Dump pm + pmalloc::available, #l_node    
+    
     ; Merge around current    
     FarMalloc_Merge l_node
 
@@ -690,7 +691,7 @@ farmalloc_merge_forward_loop:
 
 farmalloc_merge_forward_loop_end:
 
-    FarMalloc_Chain_Dump pm + pmalloc::available, #malloc_available_str  
+    ;FarMalloc_Chain_Dump pm + pmalloc::available, #malloc_available_str  
 
     ; Exit the procedure
     FreeLocals
@@ -777,7 +778,7 @@ farmalloc_merge_forward_loop_end:
         lda [node],y
         ldy #pmalloc_item::prev+2
         ora [node],y
-        beq l1_else
+        beq l1_endif
             ; *root = node->pmalloc_item::prev;
             ldy #pmalloc_item::prev
             lda [node], y
@@ -786,8 +787,14 @@ farmalloc_merge_forward_loop_end:
             lda [node]
             ldy #$0002
             sta [root], y
-            bra l1_endif
-        l1_else:      
+            bra l2_endif
+        l1_endif:
+
+        ldy #pmalloc_item::next
+        lda [node],y
+        ldy #pmalloc_item::next+2
+        ora [node],y
+        beq l3_endif
             ; *root = node->pmalloc_item::next;  
             ldy #pmalloc_item::next
             lda [node],y
@@ -795,10 +802,18 @@ farmalloc_merge_forward_loop_end:
             ldy #pmalloc_item::next+2
             lda [node],y
             ldy #$0002
-            sta [root], y    
-        l1_endif: 
+            sta [root], y   
+            bra l2_endif 
+        l3_endif: 
 
-    l2_endif:       
+        ; If you get here, both prev and next are NULL  
+        ; *root = NULL;
+        ldy #$0002
+        lda #$0000
+        sta [root]
+        sta [root],y    
+
+    l2_endif:        
 
     ; node->next = NULL
     ldy #pmalloc_item::next
@@ -923,6 +938,7 @@ o2:     ; Code when true
         ; *root = ptr
         lda ptr
         sta [root]
+        ldy #$0002
         lda ptr+2
         sta [root],y
 

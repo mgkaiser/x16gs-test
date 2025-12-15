@@ -77,7 +77,25 @@ BUFFER_SIZE         = 32
 
     FarFree *l_p1
 
-    FarMalloc_Header_Dump     
+    FarMalloc_Header_Dump   
+
+    ; Test Farmalloc                  
+    DebugPrintCR
+    DebugPrint #header_str
+    DebugPrint #after_malloc_str
+    DebugPrint #header_str  
+    
+    FarMalloc #$000010
+    sta l_p1
+    stx l_p1+2  
+
+    FarMalloc_Header_Dump   
+
+    ; Convert result to PETSCII    
+    ToHexL l_p1, buffer 
+    DebugPrint #l_p1_str
+    DebugPrint #buffer            
+    DebugPrintCR
     
     ; Exit the procedure
     FreeLocals
