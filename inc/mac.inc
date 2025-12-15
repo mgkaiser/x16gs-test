@@ -178,12 +178,29 @@
 
 .macro SetParamL arg
 	.out "-- f:PEA --"
-	.byte $f4
-	.byte ^(.right (.tcount ({arg})-1, {arg}))		
-	.byte $00
-	.byte $f4
-	.byte <(.right (.tcount ({arg})-1, {arg}))		
-	.byte >(.right (.tcount ({arg})-1, {arg}))	
+	.if (.match (.left (1, {arg}), #))
+		.byte $f4
+		.byte ^(.right (.tcount ({arg})-1, {arg}))
+		.byte $00
+		.byte $f4
+		.byte <(.right (.tcount ({arg})-1, {arg}))
+		.byte >(.right (.tcount ({arg})-1, {arg}))
+	.else
+		.if (.match (.left (1, {arg}), *))
+			.out "-- PEI --"
+			lda .right (.tcount ({arg})-1, {arg}) + 2
+			pha
+			lda .right (.tcount ({arg})-1, {arg})
+			pha
+		.else 
+			.byte $f4
+			.byte ^(.right (.tcount ({arg})-1, {arg}))
+			.byte $00
+			.byte $f4
+			.byte <(.right (.tcount ({arg})-1, {arg}))		
+			.byte >(.right (.tcount ({arg})-1, {arg}))				
+		.endif
+	.endif
 .endmacro	
 
 .macro SetRetVal

@@ -3,6 +3,7 @@
 .include "mac.inc"
 .include "kernalstruct.inc"
 .include "kernal.inc"
+.include "x16.inc"
 .include "malloc.inc"
 .include "print.inc"
 .include "file.inc"
@@ -24,9 +25,11 @@ BUFFER_SIZE         = 32
     ProcNear                                                ; This is "near" if called with "jsr" and "far" if called with "jsl"     
 
     ; Create local variable - Number in descending order, skip 2 for long parameters
-    DeclareLocalL l_p, 0                                    ; This is a uint32_t local variable
+    DeclareLocalL l_p3, 6                                   ; This is a uint32_t local variable
+    DeclareLocalL l_p2, 4                                   ; This is a uint32_t local variable
+    DeclareLocalL l_p1, 2                                   ; This is a uint32_t local variable
     DeclareLocalL l_temp, 0                                 ; This is a uint32_t local variable
-    SetLocalCount 4                                         ; Number of (16 bit) local variables declared                   
+    SetLocalCount 8                                         ; Number of (16 bit) local variables declared                   
 
     ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
 
@@ -38,21 +41,44 @@ BUFFER_SIZE         = 32
     Load #1, #8, #0, #overlay2_filename, #OVERLAY2_LOAD_ADDR
     
     ; Initialize the malloc system
-    breakpoint
-    FarMalloc_Init
-    FarMalloc_AddBlock #MALLOC_START, #MALLOC_SIZE	    
+    DebugPrintCR
+    DebugPrint #header_str
+    DebugPrint #after_init_str
+    DebugPrint #header_str    
 
-    ; Test Farmalloc    
-    FarMalloc #$000400
-    sta l_p
-    stx l_p+2    
+    FarMalloc_Init    
+    FarMalloc_AddBlock #MALLOC_START, #MALLOC_SIZE	        
 
-    ; Convert result to PETSCII
-    ToHexL l_p, buffer    
+    FarMalloc_Header_Dump     
 
-    ; Print it
-    Print #buffer
+    ; Test Farmalloc                  
+    DebugPrintCR
+    DebugPrint #header_str
+    DebugPrint #after_malloc_str
+    DebugPrint #header_str  
 
+    FarMalloc #$000010
+    sta l_p1
+    stx l_p1+2  
+
+    FarMalloc_Header_Dump     
+
+    ; Convert result to PETSCII    
+    ToHexL l_p1, buffer 
+    DebugPrint #l_p1_str
+    DebugPrint #buffer            
+    DebugPrintCR
+
+    ; Let p1 be freed    
+    DebugPrintCR    
+    DebugPrint #header_str
+    DebugPrint #after_free_str
+    DebugPrint #header_str
+
+    FarFree *l_p1
+
+    FarMalloc_Header_Dump     
+    
     ; Exit the procedure
     FreeLocals
     ProcSuffix  
@@ -71,3 +97,12 @@ buffer:
 ; String Constants
 overlay1_filename: .byte "X16GS-TEST.OV1.BIN", $00
 overlay2_filename: .byte "X16GS-TEST.OV2.BIN", $00
+
+l_p1_str:          .byte "POINTER 1:  ", $00
+l_p2_str:          .byte "POINTER 2:  ", $00
+l_p3_str:          .byte "POINTER 3:  ", $00 
+header_str:        .byte "**************************************", $0a, $00
+after_init_str:    .byte "** AFTER INIT:", $0a, $00
+after_malloc_str:  .byte "** AFTER MALLOC:", $0a, $00
+after_free_str:    .byte "** AFTER FREE:", $0a, $00
+

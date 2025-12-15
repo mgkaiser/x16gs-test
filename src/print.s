@@ -5,12 +5,14 @@
 .include "mac.inc"
 .include "kernalstruct.inc"
 .include "kernal.inc"
+.include "x16.inc"
 
 .segment "OVERLAY1"
 
 ; Define exports for all public functions in this module
 .export tohex
 .export print
+.export debug_print
 
 hextemplate:
     .byte "0123456789ABCDEF"
@@ -93,11 +95,63 @@ tohex_loop:
 PrintLoop:
 
     ; if *string == NULL exit
-    lda [string]    
+    lda [string]
+    and #$00FF    
     beq PrintExit
 
     ; Output character    
     jsl bsout_far
+
+    ; string++
+    clc
+    lda string
+    adc #$0001
+    sta string
+    lda string+2    
+    adc #$0000  
+    sta string+2
+
+    ; Next
+    bra PrintLoop
+
+PrintExit:
+
+    FreeLocals  
+    ProcSuffix
+
+    rtl
+.endproc
+
+.proc debug_print: far
+
+    ProcPrefix
+    ProcFar
+
+    ; Create local variable - Number in descending order, skip 2 for long parameters    
+    SetLocalCount 0                                         ; Number of (16 bit) local variables declared                   
+
+    ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters
+    DeclareParam string, 0                                  ; uint32_t size    
+
+    ; Setup stack frame
+    SetupStackFrame   
+
+    ; if string == NULL exit
+    lda string
+    ora string+2
+    beq PrintExit 
+
+PrintLoop:
+
+    ; if *string == NULL exit
+    lda [string]
+    and #$00FF    
+    beq PrintExit
+
+    ; Output character  
+    mode8
+    sta f:x16_debug::debug_print
+    mode16
 
     ; string++
     clc

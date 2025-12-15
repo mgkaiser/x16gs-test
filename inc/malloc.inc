@@ -3,6 +3,9 @@
 .import farmalloc_addblock: far
 .import farmalloc: far
 .import farfree: far
+.import farmalloc_chain_dump: far
+
+.import farmalloc_header_dump: far
 
 ; Define Macros to call these functions from assembly
 .macro FarMalloc_Init
@@ -30,6 +33,11 @@
 .macro FarFree ptr
     .out "FarFree"
     SetParamL ptr
-    jsr FarFree
+    jsl farfree
     FreeParams 2
+.endmacro
+
+.macro FarMalloc_Header_Dump
+    .out "FarMalloc_Header_Dump"    
+    jsl farmalloc_header_dump
 .endmacro

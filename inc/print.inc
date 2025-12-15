@@ -1,5 +1,6 @@
 .import tohex: far
 .import print: far
+.import debug_print: far
 
 .macro ToHex value, ptr
     .out "ToHex"        
@@ -20,4 +21,26 @@
     SetParamL value
     jsl print
     FreeParams 2
+.endmacro
+
+.macro PrintCR
+    .out "PrintCR" 
+    .a16               
+    lda #$000d
+    jsl bsout_far
+.endmacro
+
+.macro DebugPrint value
+    .out "Print"            
+    SetParamL value
+    jsl debug_print
+    FreeParams 2
+.endmacro
+
+.macro DebugPrintCR
+    .out "PrintCR" 
+    mode8
+    lda #$0a
+    sta f:x16_debug::debug_print
+    mode16
 .endmacro
