@@ -1,9 +1,11 @@
 .p816
 
 .include "mac.inc"
-.include "kernalstruct.inc"
+.include "kernal_struct.inc"
 .include "kernal.inc"
 .include "x16.inc"
+.include "linkedlist_struct.inc"
+.include "linkedlist.inc"
 .include "malloc.inc"
 .include "print.inc"
 .include "file.inc"
@@ -47,7 +49,13 @@ BUFFER_SIZE         = 32
     FarMalloc_AddBlock #MALLOC_START, #MALLOC_SIZE	        
 
     ; Allocate and free a memory block
-    FarMalloc #$000010, l_p1        
+    FarMalloc #.sizeof(linkedlist), l_p1        
+
+    ; Initialize linked list    
+    breakpoint
+    LL_Init *l_p1   
+
+    ; Free the allocated block
     FarFree *l_p1            
 
     ; Exit the procedure
@@ -58,6 +66,9 @@ BUFFER_SIZE         = 32
     rts
 
 .endproc
+
+; Linked List
+linked_list: .res .sizeof(linkedlist)   
 
 ; Workspace to hold converted hex string
 buffer: 

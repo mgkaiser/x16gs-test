@@ -29,7 +29,7 @@ OVERLAY1_ROOT = x16gs-test.ov1
 OVERLAY2_ROOT = x16gs-test.ov2
 
 # Define sources for the main program and overlays
-MAIN_SOURCES = src/main.s src/malloc.s src/kernal.s src/file.s src/print.s 
+MAIN_SOURCES = src/main.s src/malloc.s src/kernal.s src/file.s src/print.s src/linkedlist.s 
 
 # Define output binaries
 MAIN_BIN = $(BUILD_DIR)/$(MAIN_ROOT).bin

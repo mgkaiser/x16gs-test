@@ -3,7 +3,7 @@
 .I16
 
 .include "mac.inc"
-.include "kernalstruct.inc"
+.include "kernal_struct.inc"
 
 .segment "MAIN"
 
