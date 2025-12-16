@@ -12,8 +12,6 @@
 .export farmalloc_addblock
 .export farmalloc
 .export farfree
-.export farmalloc_header_dump
-.export farmalloc_chain_dump
 .export pm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -853,15 +851,11 @@ farmalloc_merge_forward_loop_end:
     ; Setup stack frame
     SetupStackFrame    
 
-    DebugPrintHexLWithCR malloc_insert, root, malloc_buffer
-
     ; if (*root == NULL) { *root = ptr; return; }      
     lda [root]
     ldy #$0002
     ora [root],y
     bne :+
-
-        DebugPrint #malloc_insert_noroot
 
         ; *root = ptr
         lda ptr
@@ -909,8 +903,6 @@ o1: bcc o2
     bra o3
 
 o2:     ; Code when true
-
-        DebugPrint #malloc_insert_before_root
         
         ; New block goes before root
         ;*l_p_oldroot = *l_p_root
@@ -949,8 +941,6 @@ o2:     ; Code when true
 o3:     ; Code when false
 
         ; New block goes witin or at end of list
-
-        DebugPrint #malloc_insert_not_before_root
 
         ; current = *root
         lda l_p_root
@@ -1007,11 +997,6 @@ f2:
     ora [l_p_current],y
     bnel g1
 
-        DebugPrint #malloc_insert_at_end
-
-        DebugPrintHexLWithCR malloc_node_str, l_p_node, malloc_buffer
-        DebugPrintHexLWithCR malloc_current_str, l_p_current, malloc_buffer
-
         ; l_p_node->prev = l_p_current
         ldy #pmalloc_item::prev
         lda l_p_current
@@ -1030,9 +1015,7 @@ f2:
         
     bra g2
 
-g1: ;else   
-
-    DebugPrint #malloc_insert_within
+g1: ;else       
 
     ; l_p_oldnext = l_p_current->next
     ldy #pmalloc_item::next
@@ -1097,181 +1080,3 @@ farmalloc_item_insert_exit:
     sta variable + 2
 .endmacro
 
-.proc farmalloc_header_dump: far
-
-    ; Save working registers
-    ProcPrefix 
-    ProcFar                                                ; This is "near" if called with "jsr" and "far" if called with "jsl" 
-
-    ; Create local variable - Number in descending order, skip 2 for long parameters
-    DeclareLocal l_p_pm, 2                                  ; This is a uint16_t local variable
-    DeclareLocalL l_temp, 0                                 ; This is a uint32_t local variable    
-    SetLocalCount 3                                         ; Number of (16 bit) local variables declared                   
-    
-    ; Setup stack frame
-    SetupStackFrame  
-
-    ; Store a pointer to pm in l_p_pm (a local variable in DP)
-    lda #.LOWORD(pm)
-    sta l_p_pm  
-
-    ; Print the delimiter
-    DebugPrint #malloc_delimiter_str
-    DebugPrintCR  
-
-    ; Print the available    
-    StructElementToVar l_p_pm, pmalloc::available, l_temp
-    DebugPrintHexLWithCR malloc_available_str, l_temp, malloc_buffer                 
-
-    ; Print the assigned    
-    StructElementToVar l_p_pm, pmalloc::assigned, l_temp
-    DebugPrintHexLWithCR malloc_assigned_str, l_temp, malloc_buffer                     
-
-    ; Print the freemem
-    StructElementToVar l_p_pm, pmalloc::freemem, l_temp
-    DebugPrintHexLWithCR malloc_freemem_str, l_temp, malloc_buffer         
-
-    ; Print the totalmem
-    StructElementToVar l_p_pm, pmalloc::totalmem, l_temp
-    DebugPrintHexLWithCR malloc_totalmem_str, l_temp, malloc_buffer             
-
-    ; Print the totalnodes
-    StructElementToVar l_p_pm, pmalloc::totalnode, l_temp
-    DebugPrintHexLWithCR malloc_totalnodes_str, l_temp, malloc_buffer                         
-
-    ; Exit the procedure
-    FreeLocals
-    ProcSuffix  
-
-    ; Return from "near" procedure with "rts"; from "far" procedure with "rtl"
-    rtl
-
-.endproc    
-
-.proc farmalloc_chain_dump : far
-
-    ; Save working registers
-    ProcPrefix 
-    ProcFar                                                ; This is "near" if called with "jsr" and "far" if called with "jsl" 
-
-    ; Create local variable - Number in descending order, skip 2 for long parameters
-    DeclareLocalL l_p_temp, 2                               ; This is a uint32_t local variable
-    DeclareLocalL l_p_current, 0                            ; This is a uint32_t local variable
-    SetLocalCount 4                                         ; Number of (16 bit) local variables declared                   
-
-    ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters        
-    DeclareParam value, 0                                    ; uint32_t ptr                                 
-    DeclareParam root, 2                                    ; uint32_t ptr                                 
-
-    ; Setup stack frame
-    SetupStackFrame  
-
-    DebugPrint #malloc_delimiter_str
-    DebugPrintCR
-    DebugPrint *value    
-
-    ; Bail if root == NULL
-    lda root
-    beql FarMalloc_Chain_Dump_Exit
-
-    ; current = root
-    ldy #$0002
-    lda [root]
-    sta l_p_current
-    lda [root], y   
-    sta l_p_current + 2
-
-FarMalloc_Chain_Dump_Loop:
-        ; if (current == NULL) goto FarMalloc_Chain_Dump_Exit;        
-        lda l_p_current + 2
-        ora l_p_current
-        beql FarMalloc_Chain_Dump_Exit
-
-        ; Print current address
-        ToHexL l_p_current, malloc_buffer
-        DebugPrint #malloc_buffer
-        DebugPrint #malloc_colon_str
-
-        ; Print prev
-        ldy #pmalloc_item::prev
-        lda [l_p_current],y
-        sta l_p_temp
-        ldy #pmalloc_item::prev+2
-        lda [l_p_current],y
-        sta l_p_temp + 2
-        ToHexL l_p_temp, malloc_buffer
-        DebugPrint #malloc_buffer
-        DebugPrint #malloc_colon_str
-
-        ; Print next
-        ldy #pmalloc_item::next
-        lda [l_p_current],y
-        sta l_p_temp
-        ldy #pmalloc_item::next+2
-        lda [l_p_current],y
-        sta l_p_temp + 2
-        ToHexL l_p_temp, malloc_buffer
-        DebugPrint #malloc_buffer
-        DebugPrint #malloc_colon_str
-
-        ; Print size
-        ldy #pmalloc_item::size
-        lda [l_p_current],y
-        sta l_p_temp
-        ldy #pmalloc_item::size+2
-        lda [l_p_current],y
-        sta l_p_temp + 2
-        ToHexL l_p_temp, malloc_buffer
-        DebugPrint #malloc_buffer
-        DebugPrintCR
-
-        ; temp = current->pmalloc_item::next
-        ldy #pmalloc_item::next
-        lda [l_p_current],y
-        sta l_p_temp
-        ldy #pmalloc_item::next+2
-        lda [l_p_current],y
-        sta l_p_temp + 2     
-
-        ; current = temp        
-        lda l_p_temp
-        sta l_p_current         
-        lda l_p_temp + 2
-        sta l_p_current + 2
-        
-        brl FarMalloc_Chain_Dump_Loop
-
-FarMalloc_Chain_Dump_Exit:
-
-    ;DebugPrint #malloc_delimiter_str
-    ;DebugPrintCR
-
-    ; Exit the procedure
-    FreeLocals
-    ProcSuffix  
-
-    ; Return from "near" procedure with "rts"; from "far" procedure with "rtl"
-    rtl
-.endproc
-
-malloc_buffer: 
-    .repeat 32
-        .byte $00
-    .endrepeat
-
-malloc_delimiter_str:           .byte "------------------------", $00
-malloc_available_str:           .byte "AVAILABLE:  ", $00
-malloc_assigned_str:            .byte "ASSIGNED:   ", $00
-malloc_freemem_str:             .byte "FREEMEM:    ", $00
-malloc_totalmem_str:            .byte "TOTALMEM:   ", $00    
-malloc_totalnodes_str:          .byte "TOTALNODES: ", $00
-malloc_colon_str:               .byte " : ", $00    
-malloc_insert:                  .byte "Inserting into malloc list: ", $00
-malloc_insert_noroot:           .byte "Inserting into malloc list as root", $0a, $00
-malloc_insert_before_root:      .byte "Inserting into malloc list before root", $0a, $00
-malloc_insert_not_before_root:  .byte "Inserting into malloc list NOT before root", $0a, $00    
-malloc_insert_at_end:           .byte "Inserting into malloc list at end", $0a, $00
-malloc_insert_within:           .byte "Inserting into malloc list within list before node", $0a, $00
-malloc_node_str:                .byte "l_p_node: ", $00
-malloc_currentnext_str:         .byte "l_p_current->next: ", $00
-malloc_current_str:             .byte "l_p_current: ", $00

@@ -11,11 +11,15 @@
 
 .segment "MAIN"
 
-; Define symbolic constants
+; Load addresses of the overlays
 OVERLAY1_LOAD_ADDR  = $100000
 OVERLAY2_LOAD_ADDR  = $110000
+
+; Allocate the heap as MALLOC_SIZE bytes starting at MALLOC_START
 MALLOC_START        = $010000
 MALLOC_SIZE	        = $040000
+
+; Size of buffer for converted hex string
 BUFFER_SIZE         = 32
 
 .proc main: near
@@ -24,12 +28,10 @@ BUFFER_SIZE         = 32
     ProcPrefix 
     ProcNear                                                ; This is "near" if called with "jsr" and "far" if called with "jsl"     
 
-    ; Create local variable - Number in descending order, skip 2 for long parameters
-    DeclareLocalL l_p3, 6                                   ; This is a uint32_t local variable
-    DeclareLocalL l_p2, 4                                   ; This is a uint32_t local variable
+    ; Create local variable - Number in descending order, skip 2 for long parameters    
     DeclareLocalL l_p1, 2                                   ; This is a uint32_t local variable
     DeclareLocalL l_temp, 0                                 ; This is a uint32_t local variable
-    SetLocalCount 8                                         ; Number of (16 bit) local variables declared                   
+    SetLocalCount 4                                         ; Number of (16 bit) local variables declared                   
 
     ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
 
@@ -38,155 +40,15 @@ BUFFER_SIZE         = 32
     
     ; Load the overlays
     Load #1, #8, #0, #overlay1_filename, #OVERLAY1_LOAD_ADDR
-    Load #1, #8, #0, #overlay2_filename, #OVERLAY2_LOAD_ADDR
-    
-    ; Initialize the malloc system
-    DebugPrintCR
-    DebugPrint #header_str
-    DebugPrint #after_init_str
-    DebugPrint #header_str    
+    Load #1, #8, #0, #overlay2_filename, #OVERLAY2_LOAD_ADDR   
 
+    ; Initialize memory allocation system
     FarMalloc_Init    
     FarMalloc_AddBlock #MALLOC_START, #MALLOC_SIZE	        
 
-    FarMalloc_Header_Dump     
-    FarMalloc_Chain_Dump pm + $0000, #available_str
-    FarMalloc_Chain_Dump pm + $0004,  #assigned_str 
-
-    ; Test Farmalloc                  
-    DebugPrintCR
-    DebugPrint #header_str
-    DebugPrint #after_malloc_str
-    DebugPrint #header_str  
-
-    FarMalloc #$000010, l_p1    
-
-    FarMalloc_Header_Dump 
-    FarMalloc_Chain_Dump pm + $0000, #available_str
-    FarMalloc_Chain_Dump pm + $0004,  #assigned_str     
-
-    ; Convert result to PETSCII    
-    DebugPrintHexLWithCR l_p1_str, l_p1, buffer          
-
-    ; Test Farmalloc                  
-    DebugPrintCR
-    DebugPrint #header_str
-    DebugPrint #after_malloc_str
-    DebugPrint #header_str  
-    
-    FarMalloc #$000010, l_p2    
-
-    FarMalloc_Header_Dump   
-    FarMalloc_Chain_Dump pm + $0000, #available_str
-    FarMalloc_Chain_Dump pm + $0004,  #assigned_str     
-
-    ; Convert result to PETSCII        
-    DebugPrintHexLWithCR l_p2_str, l_p2, buffer      
-
-    ; Test Farmalloc                  
-    DebugPrintCR
-    DebugPrint #header_str
-    DebugPrint #after_malloc_str
-    DebugPrint #header_str  
-    
-    FarMalloc #$000010, l_p3    
-
-    FarMalloc_Header_Dump   
-    FarMalloc_Chain_Dump pm + $0000, #available_str
-    FarMalloc_Chain_Dump pm + $0004,  #assigned_str     
-
-    ; Convert result to PETSCII  
-    DebugPrintHexLWithCR l_p3_str, l_p3, buffer      
-
-    ; Let p3 be freed    
-    DebugPrintCR    
-    DebugPrint #header_str
-    DebugPrint #after_free_str
-    DebugPrint #header_str
-
-    ; Convert result to PETSCII    
-    DebugPrintHexLWithCR l_p3_str, l_p3, buffer          
-
-    FarFree *l_p3
-
-    FarMalloc_Header_Dump   
-    FarMalloc_Chain_Dump pm + $0000, #available_str
-    FarMalloc_Chain_Dump pm + $0004,  #assigned_str     
-
-    ; Test Farmalloc                  
-    DebugPrintCR
-    DebugPrint #header_str
-    DebugPrint #after_malloc_str
-    DebugPrint #header_str  
-    
-    FarMalloc #$000010, l_p3    
-
-    FarMalloc_Header_Dump   
-    FarMalloc_Chain_Dump pm + $0000, #available_str
-    FarMalloc_Chain_Dump pm + $0004,  #assigned_str     
-
-    ; Convert result to PETSCII    
-    DebugPrintHexLWithCR l_p3_str, l_p3, buffer          
-
-    ; Let p2 be freed    
-    DebugPrintCR    
-    DebugPrint #header_str
-    DebugPrint #after_free_str
-    DebugPrint #header_str
-
-    ; Convert result to PETSCII    
-    DebugPrintHexLWithCR l_p2_str, l_p2, buffer          
-
-    FarFree *l_p2
-
-    FarMalloc_Header_Dump   
-    FarMalloc_Chain_Dump pm + $0000, #available_str
-    FarMalloc_Chain_Dump pm + $0004,  #assigned_str     
-
-    ; Test Farmalloc                  
-    DebugPrintCR
-    DebugPrint #header_str
-    DebugPrint #after_malloc_str
-    DebugPrint #header_str  
-    
-    FarMalloc #$000010, l_p2  
-
-    FarMalloc_Header_Dump   
-    FarMalloc_Chain_Dump pm + $0000, #available_str
-    FarMalloc_Chain_Dump pm + $0004,  #assigned_str     
-
-    ; Convert result to PETSCII    
-    DebugPrintHexLWithCR l_p2_str, l_p2, buffer  
-
-    ; Let p1 be freed    
-    DebugPrintCR    
-    DebugPrint #header_str
-    DebugPrint #after_free_str
-    DebugPrint #header_str
-
-    ; Convert result to PETSCII    
-    DebugPrintHexLWithCR l_p2_str, l_p2, buffer          
-
-    FarFree *l_p1
-
-    FarMalloc_Header_Dump   
-    FarMalloc_Chain_Dump pm + $0000, #available_str
-    FarMalloc_Chain_Dump pm + $0004,  #assigned_str     
-
-    ; Test Farmalloc                  
-    DebugPrintCR
-    DebugPrint #header_str
-    DebugPrint #after_malloc_str
-    DebugPrint #header_str  
-    
-    FarMalloc #$000010, l_p1  
-
-    FarMalloc_Header_Dump   
-    FarMalloc_Chain_Dump pm + $0000, #available_str
-    FarMalloc_Chain_Dump pm + $0004,  #assigned_str     
-
-    ; Convert result to PETSCII    
-    DebugPrintHexLWithCR l_p1_str, l_p1, buffer      
+    ; Allocate and free a memory block
+    FarMalloc #$000010, l_p1        
+    FarFree *l_p1            
 
     ; Exit the procedure
     FreeLocals
@@ -206,14 +68,3 @@ buffer:
 ; String Constants
 overlay1_filename: .byte "X16GS-TEST.OV1.BIN", $00
 overlay2_filename: .byte "X16GS-TEST.OV2.BIN", $00
-
-l_p1_str:          .byte "POINTER 1:  ", $00
-l_p2_str:          .byte "POINTER 2:  ", $00
-l_p3_str:          .byte "POINTER 3:  ", $00 
-header_str:        .byte "**************************************", $0a, $00
-after_init_str:    .byte "** AFTER INIT:", $0a, $00
-after_malloc_str:  .byte "** AFTER MALLOC:", $0a, $00
-after_free_str:    .byte "** AFTER FREE:", $0a, $00
-available_str:     .byte "AVAILABLE: ", $0a, $00
-assigned_str:      .byte "ASSIGNED:  ", $0a, $00
-
