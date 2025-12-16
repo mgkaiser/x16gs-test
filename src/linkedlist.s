@@ -9,6 +9,20 @@
 .export ll_init
 .export ll_insert_head
 .export ll_insert_tail
+.export ll_remove
+;.export ll_move_to_top
+;.export ll_move_to_bottom
+;.export ll_move_up
+;.export ll_move_down
+.export ll_get_head
+.export ll_get_tail
+.export ll_get_next
+.export ll_get_prev
+;.export ll_is_empty
+;.export ll_get_size
+;.export ll_clear
+;.export ll_iterate_forward
+;.export ll_iterate_backward
     
 .segment "OVERLAY1"
 
@@ -270,3 +284,273 @@ LL_InsertTail_Exit:
     ; Return from "near" procedure with "rts"; from "far" procedure with "rtl"
     rtl
 .endproc 
+
+.proc ll_remove : far
+
+    ProcPrefix
+    ProcFar
+
+    ; Create local variable - Number in descending order, skip 2 for long parameters    
+    DeclareLocalL l_temp, 0                                 ; This is a uint32_t local variable
+    SetLocalCount 2                                         ; Number of (16 bit) local variables declared                   
+
+    ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
+    DeclareParam node, 0                                    ; uint32_t    
+    DeclareParam list, 2                                    ; uint32_t                                  
+    DeclareParam r_retVal, 4                                ; uint32_t 
+
+    ; Setup stack frame
+    SetupStackFrame   
+
+    ; if (list == NULL || node == null) return NULL;
+    lda list
+    ora list+2
+    beql LL_Remove_Exit
+    lda node
+    ora node+2      
+    beql LL_Remove_Exit
+
+    ; if (node->prev == NULL)
+    ldy #ll_node::prev
+    lda [node],y
+    ldy #ll_node::prev+2
+    ora [node],y
+    beq l01
+
+        ; l_temp = node->prev;
+        ldy #ll_node::prev
+        lda [node],y
+        sta l_temp
+        ldy #ll_node::prev+2
+        lda [node],y
+        sta l_temp+2
+
+        ; l_temp->next = node->next;
+        ldy #ll_node::next
+        lda [node],y        
+        sta [l_temp],y        
+        ldy #ll_node::next+2
+        lda [node],y        
+        sta [l_temp],y
+
+        bra l02
+l01: ;else
+
+        ; list->head = node->next;
+        ldy #ll_node::next
+        lda [node],y
+        ldy #linkedlist::head
+        sta [list],y
+        ldy #ll_node::next+2
+        lda [node],y
+        ldy #linkedlist::head+2
+        sta [list],y
+
+l02: ;endif
+
+    ; if (node->next == NULL)
+    ldy #ll_node::next
+    lda [node],y
+    ldy #ll_node::next+2
+    ora [node],y
+    beq l11
+
+        ; l_temp = node->next;
+        ldy #ll_node::next
+        lda [node],y
+        sta l_temp
+        ldy #ll_node::next+2
+        lda [node],y
+        sta l_temp+2
+
+        ; l_temp->prev = node->prev;
+        ldy #ll_node::prev
+        lda [node],y
+        sta [l_temp],y
+        ldy #ll_node::prev+2
+        lda [node],y
+        sta [l_temp],y
+
+        bra l12
+l11: ;else     
+
+        ; list->tail = node->prev;
+        ldy #ll_node::prev
+        lda [node],y
+        ldy #linkedlist::tail
+        sta [list],y
+        ldy #ll_node::prev+2
+        lda [node],y
+
+l12: ;endif
+
+LL_Remove_Exit:
+
+    ; Exit the procedure
+    FreeLocals
+    ProcSuffix  
+
+    ; Return from "near" procedure with "rts"; from "far" procedure with "rtl"
+    rtl
+    
+.endproc
+
+.proc ll_get_head : far
+
+    ProcPrefix
+    ProcFar
+
+    ; Create local variable - Number in descending order, skip 2 for long parameters    
+    SetLocalCount 0                                         ; Number of (16 bit) local variables declared                   
+
+    ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
+    DeclareParam list, 0                                    ; uint32_t                                  
+    DeclareParam r_retVal, 2                                ; uint32_t 
+
+    ; Setup stack frame
+    SetupStackFrame   
+
+    ; if (list == NULL) return NULL;
+    lda list
+    ora list+2
+    beql LL_GetHead_Exit 
+
+    ; Return list->head
+    ldy #linkedlist::head
+    lda [list],y
+    sta r_retVal
+    ldy #linkedlist::head+2
+    lda [list],y
+    sta r_retVal+2
+
+LL_GetHead_Exit:
+
+    ; Exit the procedure
+    FreeLocals
+    ProcSuffix  
+
+    ; Return from "near" procedure with "rts"; from "far" procedure with "rtl"
+    rtl
+.endproc    
+
+.proc ll_get_tail : far
+
+    ProcPrefix
+    ProcFar
+
+    ; Create local variable - Number in descending order, skip 2 for long parameters    
+    SetLocalCount 0                                         ; Number of (16 bit) local variables declared                   
+
+    ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
+    DeclareParam list, 0                                    ; uint32_t                                  
+    DeclareParam r_retVal, 2                                ; uint32_t 
+
+    ; Setup stack frame
+    SetupStackFrame   
+
+    ; if (list == NULL) return NULL;
+    lda list
+    ora list+2
+    beql LL_GetTail_Exit 
+
+    ; Return list->head
+    ldy #linkedlist::tail
+    lda [list],y
+    sta r_retVal
+    ldy #linkedlist::tail+2
+    lda [list],y
+    sta r_retVal+2
+
+LL_GetTail_Exit:
+
+    ; Exit the procedure
+    FreeLocals
+    ProcSuffix  
+
+    ; Return from "near" procedure with "rts"; from "far" procedure with "rtl"
+    rtl
+.endproc    
+
+.proc ll_get_next : far
+
+    ProcPrefix
+    ProcFar
+
+    ; Create local variable - Number in descending order, skip 2 for long parameters    
+    SetLocalCount 0                                         ; Number of (16 bit) local variables declared                   
+
+    ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
+    DeclareParam node, 0                                    ; uint32_t    
+    DeclareParam list, 2                                    ; uint32_t                                  
+    DeclareParam r_retVal, 4                                ; uint32_t 
+
+    ; Setup stack frame
+    SetupStackFrame   
+
+    ; if (list == NULL || node == null) return NULL;
+    lda list
+    ora list+2
+    beql LL_GetNext_Exit 
+    lda node
+    ora node+2
+    beql LL_GetNext_Exit    
+
+    ; Return node->next
+    ldy #ll_node::next
+    lda [node],y
+    sta r_retVal
+    ldy #ll_node::next+2
+    lda [node],y
+    sta r_retVal+2
+
+LL_GetNext_Exit:
+
+    ; Exit the procedure
+    FreeLocals
+    ProcSuffix  
+
+    ; Return from "near" procedure with "rts"; from "far" procedure with "rtl"
+    rtl
+.endproc    
+
+.proc ll_get_prev : far
+
+    ProcPrefix
+    ProcFar
+
+    ; Create local variable - Number in descending order, skip 2 for long parameters    
+    SetLocalCount 0                                         ; Number of (16 bit) local variables declared                   
+
+    ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
+    DeclareParam node, 0                                    ; uint32_t    
+    DeclareParam list, 2                                    ; uint32_t                                  
+    DeclareParam r_retVal, 4                                ; uint32_t 
+
+    ; Setup stack frame
+    SetupStackFrame   
+
+    ; if (list == NULL || node == null) return NULL;
+    lda list
+    ora list+2
+    beql LL_GetPrev_Exit 
+    lda node
+    ora node+2
+    beql LL_GetPrev_Exit    
+
+    ; Return node->prev
+    ldy #ll_node::prev
+    lda [node],y
+    sta r_retVal
+    ldy #ll_node::prev+2
+    lda [node],y
+    sta r_retVal+2
+    
+LL_GetPrev_Exit:
+
+    ; Exit the procedure
+    FreeLocals
+    ProcSuffix  
+
+    ; Return from "near" procedure with "rts"; from "far" procedure with "rtl"
+    rtl
+.endproc    

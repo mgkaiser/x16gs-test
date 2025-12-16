@@ -1,6 +1,11 @@
 .import ll_init : far
 .import ll_insert_head : far
-.import ll_insert_tail : far    
+.import ll_insert_tail : far   
+.import ll_get_head : far
+.import ll_get_tail : far
+.import ll_remove : far
+.import ll_get_next : far
+.import ll_get_prev : far
 
 .macro LL_Init list
     .out "LL_Init"        
@@ -23,4 +28,58 @@
     SetParamL node
     jsl ll_insert_tail
     FreeParams 4
+.endmacro
+
+.macro LL_GetHead list, retval
+    .out "LL_GetHead"
+    SetRetValL        
+    SetParamL list
+    jsl ll_get_head
+    FreeParams 2
+    GetRetValL          ; RetVal lands in A-LoWord, X-HiWord
+    sta retval
+    stx retval + 2
+.endmacro
+
+.macro LL_Remove list, node
+    .out "LL_Remove"    
+    SetParamL list
+    SetParamL node
+    jsl ll_remove
+    FreeParams 4    
+.endmacro
+
+.macro LL_GetTail list, retval
+    .out "LL_GetTail"
+    SetRetValL        
+    SetParamL list
+    jsl ll_get_tail
+    FreeParams 2
+    GetRetValL          ; RetVal lands in A-LoWord, X-HiWord
+    sta retval
+    stx retval + 2
+.endmacro
+
+.macro LL_GetNext list, node, retval
+    .out "LL_GetNext"
+    SetRetValL        
+    SetParamL list
+    SetParamL node
+    jsl ll_get_next
+    FreeParams 4
+    GetRetValL          ; RetVal lands in A-LoWord, X-HiWord
+    sta retval
+    stx retval + 2
+.endmacro
+
+.macro LL_GetPrev list, node, retval
+    .out "LL_GetPrev"
+    SetRetValL        
+    SetParamL list
+    SetParamL node
+    jsl ll_get_prev
+    FreeParams 4
+    GetRetValL          ; RetVal lands in A-LoWord, X-HiWord
+    sta retval
+    stx retval + 2
 .endmacro
