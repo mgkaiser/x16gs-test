@@ -44,3 +44,11 @@
     sta f:x16_debug::debug_print
     mode16
 .endmacro
+
+.macro DebugPrintHexLWithCR str, value, buffer
+    ToHexL value, buffer
+    DebugPrint #str
+    DebugPrint #buffer    
+    DebugPrintCR
+.endmacro
+

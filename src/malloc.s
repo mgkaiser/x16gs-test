@@ -838,12 +838,13 @@ farmalloc_merge_forward_loop_end:
     ProcFar                                                ; This is "near" if called with "jsr" and "far" if called with "jsl" 
 
     ; Create local variable - Number in descending order, skip 2 for long parameters
+    DeclareLocalL l_temp, 10                                ; This is a uint32_t local variable
     DeclareLocalL l_p_oldnext, 8                            ; This is a uint32_t local variable
     DeclareLocalL l_p_current, 6                            ; This is a uint32_t local variable
     DeclareLocalL l_p_node, 4                               ; This is a uint32_t local variable
     DeclareLocalL l_p_oldroot, 2                            ; This is a uint32_t local variable
     DeclareLocalL l_p_root, 0                               ; This is a uint32_t local variable
-    SetLocalCount 10                                        ; Number of (16 bit) local variables declared                   
+    SetLocalCount 12                                        ; Number of (16 bit) local variables declared                   
 
     ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters
     DeclareParam ptr, 0                                     ; uint32_t ptr                                 
@@ -852,11 +853,15 @@ farmalloc_merge_forward_loop_end:
     ; Setup stack frame
     SetupStackFrame    
 
+    DebugPrintHexLWithCR malloc_insert, root, malloc_buffer
+
     ; if (*root == NULL) { *root = ptr; return; }      
     lda [root]
     ldy #$0002
     ora [root],y
     bne :+
+
+        DebugPrint #malloc_insert_noroot
 
         ; *root = ptr
         lda ptr
@@ -904,6 +909,8 @@ o1: bcc o2
     bra o3
 
 o2:     ; Code when true
+
+        DebugPrint #malloc_insert_before_root
         
         ; New block goes before root
         ;*l_p_oldroot = *l_p_root
@@ -943,6 +950,8 @@ o3:     ; Code when false
 
         ; New block goes witin or at end of list
 
+        DebugPrint #malloc_insert_not_before_root
+
         ; current = *root
         lda l_p_root
         sta l_p_current
@@ -964,10 +973,8 @@ farmalloc_item_insert_loop:
         lda [l_p_current],y
         ldy #pmalloc_item::next+2
         ora [l_p_current],y
-        beq f2
-
+        beql f2
         
-
         ; l_p_node <= l_p_current->next        
         ldy #pmalloc_item::next+2
         lda [l_p_current],y
@@ -976,24 +983,34 @@ farmalloc_item_insert_loop:
         ldy #pmalloc_item::next
         lda [l_p_current],y
         cmp l_p_node
-f1:     bcc f2  
+f1:     bcs f2
+        beq f2
 
         ; l_p_current = l_p_current->next
         ldy #pmalloc_item::next
         lda [l_p_current],y
-        sta l_p_current 
+        sta l_temp
         ldy #pmalloc_item::next+2
         lda [l_p_current],y
-        sta l_p_current + 2             
+        sta l_temp + 2
+        lda l_temp
+        sta l_p_current
+        lda l_temp + 2
+        sta l_p_current + 2                
 
-        bra farmalloc_item_insert_loop
+        brl farmalloc_item_insert_loop
 f2:
     ; if (l_p_current->next == NULL) { ... }
     ldy #pmalloc_item::next
     lda [l_p_current],y
     ldy #pmalloc_item::next+2
     ora [l_p_current],y
-    bne g1
+    bnel g1
+
+        DebugPrint #malloc_insert_at_end
+
+        DebugPrintHexLWithCR malloc_node_str, l_p_node, malloc_buffer
+        DebugPrintHexLWithCR malloc_current_str, l_p_current, malloc_buffer
 
         ; l_p_node->prev = l_p_current
         ldy #pmalloc_item::prev
@@ -1010,10 +1027,12 @@ f2:
         ldy #pmalloc_item::next+2
         lda l_p_node + 2
         sta [l_p_current],y 
-
+        
     bra g2
 
 g1: ;else   
+
+    DebugPrint #malloc_insert_within
 
     ; l_p_oldnext = l_p_current->next
     ldy #pmalloc_item::next
@@ -1068,6 +1087,16 @@ farmalloc_item_insert_exit:
 
 .endproc
 
+.macro StructElementToVar struc, elem, variable    
+    ; Load the element value
+    ldy #elem
+    lda (struc),y
+    sta variable
+    ldy #elem + 2
+    lda (struc),y
+    sta variable + 2
+.endmacro
+
 .proc farmalloc_header_dump: far
 
     ; Save working registers
@@ -1090,65 +1119,25 @@ farmalloc_item_insert_exit:
     DebugPrint #malloc_delimiter_str
     DebugPrintCR  
 
-    ; Print the available
-    ldy #pmalloc::available
-    lda (l_p_pm),y
-    sta l_temp
-    ldy #pmalloc::available+2
-    lda (l_p_pm),y
-    sta l_temp+2
-    ToHexL l_temp, malloc_buffer
-    DebugPrint #malloc_available_str
-    DebugPrint #malloc_buffer        
-    DebugPrintCR
+    ; Print the available    
+    StructElementToVar l_p_pm, pmalloc::available, l_temp
+    DebugPrintHexLWithCR malloc_available_str, l_temp, malloc_buffer                 
 
-    ; Print the assigned
-    ldy #pmalloc::assigned
-    lda (l_p_pm),y
-    sta l_temp
-    ldy #pmalloc::assigned+2
-    lda (l_p_pm),y
-    sta l_temp+2
-    ToHexL l_temp, malloc_buffer
-    DebugPrint #malloc_assigned_str
-    DebugPrint #malloc_buffer        
-    DebugPrintCR
+    ; Print the assigned    
+    StructElementToVar l_p_pm, pmalloc::assigned, l_temp
+    DebugPrintHexLWithCR malloc_assigned_str, l_temp, malloc_buffer                     
 
     ; Print the freemem
-    ldy #pmalloc::freemem
-    lda (l_p_pm),y              
-    sta l_temp
-    ldy #pmalloc::freemem+2
-    lda (l_p_pm),y
-    sta l_temp+2
-    ToHexL l_temp, malloc_buffer
-    DebugPrint #malloc_freemem_str
-    DebugPrint #malloc_buffer        
-    DebugPrintCR 
+    StructElementToVar l_p_pm, pmalloc::freemem, l_temp
+    DebugPrintHexLWithCR malloc_freemem_str, l_temp, malloc_buffer         
 
     ; Print the totalmem
-    ldy #pmalloc::totalmem
-    lda (l_p_pm),y              
-    sta l_temp
-    ldy #pmalloc::totalmem+2
-    lda (l_p_pm),y
-    sta l_temp+2
-    ToHexL l_temp, malloc_buffer
-    DebugPrint #malloc_totalmem_str
-    DebugPrint #malloc_buffer        
-    DebugPrintCR     
+    StructElementToVar l_p_pm, pmalloc::totalmem, l_temp
+    DebugPrintHexLWithCR malloc_totalmem_str, l_temp, malloc_buffer             
 
     ; Print the totalnodes
-    ldy #pmalloc::totalnode
-    lda (l_p_pm),y              
-    sta l_temp      
-    ldy #pmalloc::totalnode+2
-    lda (l_p_pm),y
-    sta l_temp+2
-    ToHexL l_temp, malloc_buffer
-    DebugPrint #malloc_totalnodes_str
-    DebugPrint #malloc_buffer        
-    DebugPrintCR    
+    StructElementToVar l_p_pm, pmalloc::totalnode, l_temp
+    DebugPrintHexLWithCR malloc_totalnodes_str, l_temp, malloc_buffer                         
 
     ; Exit the procedure
     FreeLocals
@@ -1270,10 +1259,19 @@ malloc_buffer:
         .byte $00
     .endrepeat
 
-malloc_delimiter_str:   .byte "------------------------", $00
-malloc_available_str:   .byte "AVAILABLE:  ", $00
-malloc_assigned_str:    .byte "ASSIGNED:   ", $00
-malloc_freemem_str:     .byte "FREEMEM:    ", $00
-malloc_totalmem_str:    .byte "TOTALMEM:   ", $00    
-malloc_totalnodes_str:  .byte "TOTALNODES: ", $00
-malloc_colon_str:       .byte " : ", $00    
+malloc_delimiter_str:           .byte "------------------------", $00
+malloc_available_str:           .byte "AVAILABLE:  ", $00
+malloc_assigned_str:            .byte "ASSIGNED:   ", $00
+malloc_freemem_str:             .byte "FREEMEM:    ", $00
+malloc_totalmem_str:            .byte "TOTALMEM:   ", $00    
+malloc_totalnodes_str:          .byte "TOTALNODES: ", $00
+malloc_colon_str:               .byte " : ", $00    
+malloc_insert:                  .byte "Inserting into malloc list: ", $00
+malloc_insert_noroot:           .byte "Inserting into malloc list as root", $0a, $00
+malloc_insert_before_root:      .byte "Inserting into malloc list before root", $0a, $00
+malloc_insert_not_before_root:  .byte "Inserting into malloc list NOT before root", $0a, $00    
+malloc_insert_at_end:           .byte "Inserting into malloc list at end", $0a, $00
+malloc_insert_within:           .byte "Inserting into malloc list within list before node", $0a, $00
+malloc_node_str:                .byte "l_p_node: ", $00
+malloc_currentnext_str:         .byte "l_p_current->next: ", $00
+malloc_current_str:             .byte "l_p_current: ", $00
