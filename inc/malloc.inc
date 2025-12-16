@@ -22,13 +22,15 @@
     FreeParams 4
 .endmacro
 
-.macro FarMalloc size
+.macro FarMalloc size, ptr
     .out "FarMalloc"
     SetRetValL        
     SetParamL size
     jsl farmalloc
     FreeParams 2
     GetRetValL          ; RetVal lands in A-LoWord, X-HiWord
+    sta ptr
+    stx ptr + 2
 .endmacro
 
 .macro FarFree ptr

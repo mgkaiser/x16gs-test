@@ -59,9 +59,7 @@ BUFFER_SIZE         = 32
     DebugPrint #after_malloc_str
     DebugPrint #header_str  
 
-    FarMalloc #$000010
-    sta l_p1
-    stx l_p1+2  
+    FarMalloc #$000010, l_p1    
 
     FarMalloc_Header_Dump 
     FarMalloc_Chain_Dump pm + $0000, #available_str
@@ -76,9 +74,7 @@ BUFFER_SIZE         = 32
     DebugPrint #after_malloc_str
     DebugPrint #header_str  
     
-    FarMalloc #$000010
-    sta l_p2
-    stx l_p2+2  
+    FarMalloc #$000010, l_p2    
 
     FarMalloc_Header_Dump   
     FarMalloc_Chain_Dump pm + $0000, #available_str
@@ -93,9 +89,7 @@ BUFFER_SIZE         = 32
     DebugPrint #after_malloc_str
     DebugPrint #header_str  
     
-    FarMalloc #$000010
-    sta l_p3
-    stx l_p3+2  
+    FarMalloc #$000010, l_p3    
 
     FarMalloc_Header_Dump   
     FarMalloc_Chain_Dump pm + $0000, #available_str
@@ -125,9 +119,7 @@ BUFFER_SIZE         = 32
     DebugPrint #after_malloc_str
     DebugPrint #header_str  
     
-    FarMalloc #$000010
-    sta l_p3
-    stx l_p3+2  
+    FarMalloc #$000010, l_p3    
 
     FarMalloc_Header_Dump   
     FarMalloc_Chain_Dump pm + $0000, #available_str
@@ -135,6 +127,66 @@ BUFFER_SIZE         = 32
 
     ; Convert result to PETSCII    
     DebugPrintHexLWithCR l_p3_str, l_p3, buffer          
+
+    ; Let p2 be freed    
+    DebugPrintCR    
+    DebugPrint #header_str
+    DebugPrint #after_free_str
+    DebugPrint #header_str
+
+    ; Convert result to PETSCII    
+    DebugPrintHexLWithCR l_p2_str, l_p2, buffer          
+
+    FarFree *l_p2
+
+    FarMalloc_Header_Dump   
+    FarMalloc_Chain_Dump pm + $0000, #available_str
+    FarMalloc_Chain_Dump pm + $0004,  #assigned_str     
+
+    ; Test Farmalloc                  
+    DebugPrintCR
+    DebugPrint #header_str
+    DebugPrint #after_malloc_str
+    DebugPrint #header_str  
+    
+    FarMalloc #$000010, l_p2  
+
+    FarMalloc_Header_Dump   
+    FarMalloc_Chain_Dump pm + $0000, #available_str
+    FarMalloc_Chain_Dump pm + $0004,  #assigned_str     
+
+    ; Convert result to PETSCII    
+    DebugPrintHexLWithCR l_p2_str, l_p2, buffer  
+
+    ; Let p1 be freed    
+    DebugPrintCR    
+    DebugPrint #header_str
+    DebugPrint #after_free_str
+    DebugPrint #header_str
+
+    ; Convert result to PETSCII    
+    DebugPrintHexLWithCR l_p2_str, l_p2, buffer          
+
+    FarFree *l_p1
+
+    FarMalloc_Header_Dump   
+    FarMalloc_Chain_Dump pm + $0000, #available_str
+    FarMalloc_Chain_Dump pm + $0004,  #assigned_str     
+
+    ; Test Farmalloc                  
+    DebugPrintCR
+    DebugPrint #header_str
+    DebugPrint #after_malloc_str
+    DebugPrint #header_str  
+    
+    FarMalloc #$000010, l_p1  
+
+    FarMalloc_Header_Dump   
+    FarMalloc_Chain_Dump pm + $0000, #available_str
+    FarMalloc_Chain_Dump pm + $0004,  #assigned_str     
+
+    ; Convert result to PETSCII    
+    DebugPrintHexLWithCR l_p1_str, l_p1, buffer      
 
     ; Exit the procedure
     FreeLocals
