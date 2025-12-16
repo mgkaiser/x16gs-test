@@ -1,0 +1,232 @@
+**************************************
+** TESTS FOR MALLOC IMPLEMENTATION **
+**************************************
+
+**************************************
+** 1. Initialization Tests
+**************************************
+
+Test 1.1: Initialization Success
+--------------------------------
+1. Call farmalloc_init.
+2. Verify that all fields in the pmalloc structure are initialized to 0:
+   - available == 0
+   - assigned == 0
+   - freemem == 0
+   - totalmem == 0
+   - totalnode == 0.
+
+Test 1.2: Double Initialization
+--------------------------------
+1. Call farmalloc_init twice.
+2. Verify that the second call does not corrupt the state or cause errors.
+
+Test 1.3: Invalid Initialization
+--------------------------------
+1. Attempt to allocate memory without calling farmalloc_addblock.
+2. Verify that the allocation fails (returns NULL).
+
+**************************************
+** 2. Block Addition Tests
+**************************************
+
+Test 2.1: Add Valid Block
+-------------------------
+1. Call farmalloc_addblock with a valid memory block.
+2. Verify that:
+   - freemem and totalmem are updated correctly.
+   - The block is added to the available list.
+
+Test 2.2: Add Multiple Blocks
+-----------------------------
+1. Add multiple blocks using farmalloc_addblock.
+2. Verify that:
+   - freemem and totalmem are updated correctly.
+   - The blocks are added to the available list in the correct order.
+
+Test 2.3: Add Overlapping Blocks
+--------------------------------
+1. Attempt to add overlapping memory blocks.
+2. Verify that the system rejects the overlapping block.
+
+Test 2.4: Add Zero-Sized Block
+------------------------------
+1. Attempt to add a block with size 0.
+2. Verify that the block is ignored.
+
+**************************************
+** 3. Allocation Tests
+**************************************
+
+Test 3.1: Allocate Small Block
+------------------------------
+1. Allocate a small block (e.g., 16 bytes).
+2. Verify that:
+   - The block is removed from the available list.
+   - The block is added to the assigned list.
+   - freemem is updated correctly.
+
+Test 3.2: Allocate Large Block
+------------------------------
+1. Allocate a block close to the total available memory.
+2. Verify that the allocation succeeds.
+
+Test 3.3: Allocate Zero Bytes
+-----------------------------
+1. Attempt to allocate 0 bytes.
+2. Verify that the system returns NULL.
+
+Test 3.4: Allocate More Than Available Memory
+---------------------------------------------
+1. Attempt to allocate more memory than is available.
+2. Verify that the system returns NULL.
+
+Test 3.5: Allocate Multiple Blocks
+----------------------------------
+1. Allocate multiple blocks of varying sizes.
+2. Verify that:
+   - Each block is added to the assigned list.
+   - freemem is updated correctly.
+
+Test 3.6: Alignment of Allocations
+----------------------------------
+1. Verify that allocated memory blocks are aligned to the required boundary (e.g., 16-bit or 32-bit alignment).
+
+Test 3.7: Split Block
+---------------------
+1. Allocate a block smaller than an available block.
+2. Verify that:
+   - The available block is split into two blocks.
+   - The remaining block is added back to the available list.
+
+**************************************
+** 4. Free Tests
+**************************************
+
+Test 4.1: Free Single Block
+---------------------------
+1. Allocate a block, then free it.
+2. Verify that:
+   - The block is removed from the assigned list.
+   - The block is added back to the available list.
+   - freemem is updated correctly.
+
+Test 4.2: Free Multiple Blocks
+------------------------------
+1. Allocate multiple blocks, then free them.
+2. Verify that:
+   - Each block is removed from the assigned list.
+   - Each block is added back to the available list.
+
+Test 4.3: Free Out-of-Order
+---------------------------
+1. Allocate multiple blocks, then free them in a different order.
+2. Verify that the system handles this correctly.
+
+Test 4.4: Free Invalid Pointer
+------------------------------
+1. Attempt to free a pointer that was not allocated by malloc.
+2. Verify that the system handles it gracefully.
+
+Test 4.5: Double Free
+---------------------
+1. Allocate a block, free it, and then attempt to free it again.
+2. Verify that the system detects and prevents double frees.
+
+**************************************
+** 5. Fragmentation and Merging Tests
+**************************************
+
+Test 5.1: Coalescing Free Blocks
+--------------------------------
+1. Allocate multiple adjacent blocks, then free them.
+2. Verify that the system merges them into a single free block.
+
+Test 5.2: Allocate After Fragmentation
+--------------------------------------
+1. Create a fragmented memory state.
+2. Attempt to allocate a block that fits into one of the fragmented spaces.
+3. Verify that the allocation succeeds.
+
+Test 5.3: Merge Backward
+------------------------
+1. Free a block and verify that it merges with the previous block if they are contiguous.
+
+Test 5.4: Merge Forward
+-----------------------
+1. Free a block and verify that it merges with the next block if they are contiguous.
+
+Test 5.5: Merge Both Directions
+-------------------------------
+1. Free a block that is contiguous with both the previous and next blocks.
+2. Verify that all three blocks are merged into one.
+
+**************************************
+** 6. Debugging and Reporting Tests
+**************************************
+
+Test 6.1: Dump Header
+---------------------
+1. Call farmalloc_header_dump.
+2. Verify that the output matches the current state of the pmalloc structure.
+
+Test 6.2: Dump Chain
+--------------------
+1. Call farmalloc_chain_dump for the available and assigned lists.
+2. Verify that the output matches the current state of the lists.
+
+Test 6.3: Report Free Memory
+----------------------------
+1. Verify that the freemem field is updated correctly after allocations and frees.
+
+Test 6.4: Report Total Memory
+-----------------------------
+1. Verify that the totalmem field is updated correctly after adding blocks.
+
+Test 6.5: Report Total Nodes
+----------------------------
+1. Verify that the totalnode field is updated correctly after allocations and frees.
+
+**************************************
+** 7. Stress Tests
+**************************************
+
+Test 7.1: Continuous Allocation and Free
+----------------------------------------
+1. Continuously allocate and free blocks of random sizes.
+2. Verify that the system remains stable.
+
+Test 7.2: Exhaustive Allocation
+-------------------------------
+1. Allocate blocks until the memory is exhausted.
+2. Free all blocks and verify that the memory is fully restored.
+
+Test 7.3: Randomized Stress Test
+--------------------------------
+1. Perform a randomized sequence of allocations and frees.
+2. Verify that the system behaves correctly.
+
+**************************************
+** 8. Edge Case Tests
+**************************************
+
+Test 8.1: Allocate Entire Memory
+--------------------------------
+1. Allocate a single block that uses all available memory.
+2. Verify that the allocation succeeds.
+
+Test 8.2: Free Last Block
+-------------------------
+1. Free the last allocated block.
+2. Verify that the memory is returned correctly.
+
+Test 8.3: Allocate After Freeing All Memory
+-------------------------------------------
+1. Allocate blocks until memory is exhausted.
+2. Free all blocks, then allocate again.
+3. Verify that the system resets correctly.
+
+Test 8.4: Minimum Allocation Size
+---------------------------------
+1. Allocate the smallest possible block (e.g., 1 byte).
+2. Verify that the allocation succeeds.

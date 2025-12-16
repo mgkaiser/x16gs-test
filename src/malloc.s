@@ -14,6 +14,7 @@
 .export farfree
 .export farmalloc_header_dump
 .export farmalloc_chain_dump
+.export pm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Internal structure definitions
@@ -61,14 +62,6 @@
     pei (node)   
     jsl farmalloc_merge
     FreeParams 2
-.endmacro
-
-.macro FarMalloc_Chain_Dump root, value
-    .out "FarMalloc_Chain_Dump"
-    SetParamL f:root    
-    SetParamL value
-    jsl farmalloc_chain_dump
-    FreeParams 4
 .endmacro
 
 .segment "MAIN"
@@ -973,7 +966,9 @@ farmalloc_item_insert_loop:
         ora [l_p_current],y
         beq f2
 
-        ; l_p_node <= l_p_current->next
+        
+
+        ; l_p_node <= l_p_current->next        
         ldy #pmalloc_item::next+2
         lda [l_p_current],y
         cmp l_p_node + 2
@@ -1184,8 +1179,7 @@ farmalloc_item_insert_exit:
 
     DebugPrint #malloc_delimiter_str
     DebugPrintCR
-    DebugPrint *value
-    DebugPrintCR
+    DebugPrint *value    
 
     ; Bail if root == NULL
     lda root
@@ -1209,7 +1203,18 @@ FarMalloc_Chain_Dump_Loop:
         DebugPrint #malloc_buffer
         DebugPrint #malloc_colon_str
 
-        ; Print size
+        ; Print prev
+        ldy #pmalloc_item::prev
+        lda [l_p_current],y
+        sta l_p_temp
+        ldy #pmalloc_item::prev+2
+        lda [l_p_current],y
+        sta l_p_temp + 2
+        ToHexL l_p_temp, malloc_buffer
+        DebugPrint #malloc_buffer
+        DebugPrint #malloc_colon_str
+
+        ; Print next
         ldy #pmalloc_item::next
         lda [l_p_current],y
         sta l_p_temp

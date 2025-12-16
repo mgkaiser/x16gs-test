@@ -1,3 +1,4 @@
+.import pm
 .import farmalloc_init: far
 .import farmalloc_addblock: far
 .import farmalloc_addblock: far
@@ -40,4 +41,12 @@
 .macro FarMalloc_Header_Dump
     .out "FarMalloc_Header_Dump"    
     jsl farmalloc_header_dump
+.endmacro
+
+.macro FarMalloc_Chain_Dump root, value
+    .out "FarMalloc_Chain_Dump"
+    SetParamL f:root    
+    SetParamL value
+    jsl farmalloc_chain_dump
+    FreeParams 4
 .endmacro

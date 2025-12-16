@@ -6,9 +6,8 @@ x16emu -gs -scale 2 -quality linear -fsroot /mnt/c/x16emu_win64-r49/drive -rtc -
 ~~~
 
 ## Things to Do
-* Unit Tests for Malloc
-* Print string routines
-* Code to dump malloc structures for debugging
 * Make private functions "near"
+* 3rd malloc allocates between 1st and 2nd
+
 
 
