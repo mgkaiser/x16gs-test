@@ -4,10 +4,15 @@
 .import ll_get_head : far
 .import ll_get_tail : far
 .import ll_remove : far
+;.import ll_move_to_top : far
+;.import ll_move_to_bottom : far
+;.import ll_move_up : far
+;.import ll_move_down : far
 .import ll_get_next : far
 .import ll_get_prev : far
 .import ll_is_empty : far
 .import ll_get_count : far
+.import ll_clear : far
 
 .macro LL_Init list
     .out "LL_Init"        
@@ -106,4 +111,11 @@
     GetRetValL          ; RetVal lands in A-LoWord, X-HiWord
     sta retval
     stx retval + 2
+.endmacro
+
+.macro LL_Clear list
+    .out "LL_Clear"        
+    SetParamL list
+    jsl ll_clear
+    FreeParams 2
 .endmacro

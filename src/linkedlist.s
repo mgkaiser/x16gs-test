@@ -3,6 +3,7 @@
 .I16
 
 .include "mac.inc"
+.include "malloc.inc"
 .include "linkedlist_struct.inc"
 
 ; Define exports for all public functions in this module
@@ -20,9 +21,7 @@
 .export ll_get_prev
 .export ll_is_empty
 .export ll_get_count
-;.export ll_clear
-;.export ll_iterate_forward
-;.export ll_iterate_backward
+.export ll_clear
     
 .segment "OVERLAY1"
 
@@ -641,6 +640,105 @@ l1: ; Return list->count
     sta r_retVal+2
 
 LL_GetCount_Exit:
+
+    ; Exit the procedure
+    FreeLocals
+    ProcSuffix  
+
+    ; Return from "near" procedure with "rts"; from "far" procedure with "rtl"
+    rtl
+.endproc
+
+.proc ll_clear : far
+
+    ProcPrefix
+    ProcFar
+
+    ; Create local variable - Number in descending order, skip 2 for long parameters    
+    DeclareLocalL l_func, 4                                 ; This is a uint32_t local variable
+    DeclareLocalL l_next, 2                                 ; This is a uint32_t local variable
+    DeclareLocalL l_current, 0                              ; This is a uint32_t local variable
+    SetLocalCount 6                                         ; Number of (16 bit) local variables declared                   
+
+    ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
+    DeclareParam list, 0                                    ; uint32_t                                  
+
+    ; Setup stack frame
+    SetupStackFrame   
+
+    ; if (list == NULL) return;
+    lda list
+    ora list+2
+    beql LL_Clear_Exit 
+
+    ; if (list->head == NULL) return;
+    ldy #linkedlist::head
+    lda [list],y
+    ldy #linkedlist::head+2
+    ora [list],y
+    beq LL_Clear_Exit
+
+    ; while (l_current != NULL)
+l1:
+
+        ; l_current = list->head;
+        ldy #linkedlist::head
+        lda [list],y
+        sta l_current
+        ldy #linkedlist::head+2
+        lda [list],y
+        sta l_current+2
+
+        ; l_next = l_current->next;
+        ldy #ll_node::next
+        lda [l_current],y
+        sta l_next
+        ldy #ll_node::next+2
+        lda [l_current],y
+        sta l_next+2
+
+        ;current = next;
+        lda l_next
+        sta l_current
+        lda l_next+2
+        sta l_current+2
+
+        ; ll_remove(list, node);
+        SetParamL *list
+        SetParamL *l_current
+        jsl ll_remove
+        FreeParams 4         
+
+        ; if node->ll_node::destructor == null goto l2;
+        ldy #ll_node::destructor
+        lda [l_current],y
+        ldy #ll_node::destructor+2
+        ora [l_current],y
+        beq l2
+
+            ; l_func = node->ll_node::destructor;
+            ldy #ll_node::destructor
+            lda [l_current],y
+            sta l_func
+            ldy #ll_node::destructor+2
+            lda [l_current],y
+            sta l_func+2
+
+            ; Call destructor function            
+            SetParamL *l_current
+            jsl_ptr l_func
+            FreeParams 2
+
+        ; Free the node
+l2:     FarFree *l_current  
+
+        ; if (current != null) goto l1;
+        lda l_current
+        ora l_current+2
+        bne l1
+    ; End while
+
+LL_Clear_Exit:  
 
     ; Exit the procedure
     FreeLocals

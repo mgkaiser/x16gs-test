@@ -289,3 +289,15 @@
     brl addr
 :    
 .endmacro
+
+.macro jsl_ptr addr
+	phk
+	per @+-1
+	jml [addr]	
+	@:
+.endmacro
+
+
+
+
+
