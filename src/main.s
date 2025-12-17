@@ -51,8 +51,7 @@ BUFFER_SIZE         = 32
     ; Allocate and free a memory block
     FarMalloc #.sizeof(linkedlist), l_p1        
 
-    ; Initialize linked list    
-    breakpoint
+    ; Initialize linked list        
     LL_Init *l_p1   
 
     ; Free the allocated block

@@ -18,8 +18,8 @@
 .export ll_get_tail
 .export ll_get_next
 .export ll_get_prev
-;.export ll_is_empty
-;.export ll_get_size
+.export ll_is_empty
+.export ll_get_count
 ;.export ll_clear
 ;.export ll_iterate_forward
 ;.export ll_iterate_backward
@@ -554,3 +554,98 @@ LL_GetPrev_Exit:
     ; Return from "near" procedure with "rts"; from "far" procedure with "rtl"
     rtl
 .endproc    
+
+.proc ll_is_empty : far
+
+    ProcPrefix
+    ProcFar
+
+    ; Create local variable - Number in descending order, skip 2 for long parameters    
+    SetLocalCount 0                                         ; Number of (16 bit) local variables declared                   
+
+    ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
+    DeclareParam list, 0                                    ; uint32_t                                  
+    DeclareParam r_retVal, 2                                ; uint32_t 
+
+    ; Setup stack frame
+    SetupStackFrame   
+
+    ; if (list == NULL) return 1;
+    lda list
+    ora list+2
+    bne l1
+        lda #$0001
+        sta r_retVal
+        lda #$0000
+        sta r_retVal+2
+        bra LL_IsEmpty_Exit
+
+l1: ; Return (list->head == NULL) ? 1 : 0;
+    ldy #linkedlist::head
+    lda [list],y
+    ldy #linkedlist::head+2
+    ora [list],y
+    beq l2
+        lda #$0000
+        sta r_retVal
+        lda #$0000
+        sta r_retVal+2
+        bra LL_IsEmpty_Exit
+l2: ;    
+        lda #$0001
+        sta r_retVal
+        lda #$0000
+        sta r_retVal+2
+
+LL_IsEmpty_Exit:    
+
+    ; Exit the procedure
+    FreeLocals
+    ProcSuffix  
+
+    ; Return from "near" procedure with "rts"; from "far" procedure with "rtl"
+    rtl
+.endproc    
+
+.proc ll_get_count : far
+
+    ProcPrefix
+    ProcFar
+
+    ; Create local variable - Number in descending order, skip 2 for long parameters    
+    SetLocalCount 0                                         ; Number of (16 bit) local variables declared                   
+
+    ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
+    DeclareParam list, 0                                    ; uint32_t                                  
+    DeclareParam r_retVal, 2                                ; uint32_t 
+
+    ; Setup stack frame
+    SetupStackFrame   
+
+    ; if (list == NULL) return 0;
+    lda list
+    ora list+2
+    bne l1
+        lda #$0000
+        sta r_retVal
+        lda #$0000
+        sta r_retVal+2
+        bra LL_GetCount_Exit    
+
+l1: ; Return list->count
+    ldy #linkedlist::count
+    lda [list],y
+    sta r_retVal
+    ldy #linkedlist::count+2
+    lda [list],y
+    sta r_retVal+2
+
+LL_GetCount_Exit:
+
+    ; Exit the procedure
+    FreeLocals
+    ProcSuffix  
+
+    ; Return from "near" procedure with "rts"; from "far" procedure with "rtl"
+    rtl
+.endproc

@@ -1,6 +1,7 @@
 .struct ll_node
     prev        .dword 
-    next        .dword 
+    next        .dword
+    destructor  .dword  ; function pointer to destructor function that takes the node as parameter
 .endstruct
 
 .struct linkedlist

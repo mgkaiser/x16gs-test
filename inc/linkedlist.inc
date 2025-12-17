@@ -6,6 +6,8 @@
 .import ll_remove : far
 .import ll_get_next : far
 .import ll_get_prev : far
+.import ll_is_empty : far
+.import ll_get_count : far
 
 .macro LL_Init list
     .out "LL_Init"        
@@ -79,6 +81,28 @@
     SetParamL node
     jsl ll_get_prev
     FreeParams 4
+    GetRetValL          ; RetVal lands in A-LoWord, X-HiWord
+    sta retval
+    stx retval + 2
+.endmacro
+
+.macro LL_IsEmpty list, retval
+    .out "LL_IsEmpty"
+    SetRetValL        
+    SetParamL list
+    jsl ll_is_empty
+    FreeParams 2
+    GetRetValL          ; RetVal lands in A-LoWord, X-HiWord
+    sta retval
+    stx retval + 2
+.endmacro
+
+.macro LL_GetCount list, retval
+    .out "LL_GetCount"
+    SetRetValL        
+    SetParamL list
+    jsl ll_get_count
+    FreeParams 2
     GetRetValL          ; RetVal lands in A-LoWord, X-HiWord
     sta retval
     stx retval + 2
