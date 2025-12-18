@@ -2,8 +2,10 @@
 .A16
 .I16
 
+.scope
+.define current_file "file.s"
+
 .include "mac.inc"
-.include "kernal_struct.inc"
 .include "kernal.inc"
 
 .segment "MAIN"
@@ -99,3 +101,5 @@ load_count_exit:
 
     rtl
 .endproc
+
+.endscope

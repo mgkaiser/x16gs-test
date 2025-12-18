@@ -2,8 +2,11 @@
 .A16
 .I16
 
+.scope
+.define current_file "kernal.s"
+
 .include "mac.inc"
-.include "kernal_struct.inc"
+.include "kernal.inc"
 
 .segment "MAIN"
 
@@ -113,3 +116,5 @@ kernal_fn:  .res 32
 .endproc
 
 call_kernal_indirect: jmp (registers + registers::kernal_call)
+
+.endscope

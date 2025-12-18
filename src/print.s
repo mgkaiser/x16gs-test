@@ -2,8 +2,10 @@
 .A16
 .I16
 
+.scope
+.define current_file "print.s"
+
 .include "mac.inc"
-.include "kernal_struct.inc"
 .include "kernal.inc"
 .include "x16.inc"
 
@@ -172,3 +174,5 @@ PrintExit:
 
     rtl
 .endproc
+
+.endscope

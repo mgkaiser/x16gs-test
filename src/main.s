@@ -1,14 +1,13 @@
 .p816
 
+.scope
+.define current_file "main.s"
+
 .include "mac.inc"
-.include "kernal_struct.inc"
 .include "kernal.inc"
 .include "x16.inc"
-.include "linkedlist_struct.inc"
 .include "linkedlist.inc"
-.include "panel_struct.inc"
 .include "panel.inc"
-.include "desktop_struct.inc"
 .include "desktop.inc"
 .include "malloc.inc"
 .include "print.inc"
@@ -82,3 +81,5 @@ buffer:
 ; String Constants
 overlay1_filename: .byte "X16GS-TEST.OV1.BIN", $00
 overlay2_filename: .byte "X16GS-TEST.OV2.BIN", $00
+
+.endscope

@@ -2,9 +2,12 @@
 .A16
 .I16
 
+.scope
+.define current_file "linkedlist.s"
+
 .include "mac.inc"
 .include "malloc.inc"
-.include "linkedlist_struct.inc"
+.include "linkedlist.inc"
 
 ; Define exports for all public functions in this module
 .export ll_init
@@ -746,3 +749,5 @@ LL_Clear_Exit:
     ; Return from "near" procedure with "rts"; from "far" procedure with "rtl"
     rtl
 .endproc
+
+.endscope

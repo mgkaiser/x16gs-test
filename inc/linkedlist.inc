@@ -1,18 +1,39 @@
-.import ll_init : far
-.import ll_insert_head : far
-.import ll_insert_tail : far   
-.import ll_get_head : far
-.import ll_get_tail : far
-.import ll_remove : far
-;.import ll_move_to_top : far
-;.import ll_move_to_bottom : far
-;.import ll_move_up : far
-;.import ll_move_down : far
-.import ll_get_next : far
-.import ll_get_prev : far
-.import ll_is_empty : far
-.import ll_get_count : far
-.import ll_clear : far
+; Only import these if you are not in the linkedlist.s source file itself
+.if !.xmatch(current_file, "linkedlist.s")
+
+    .import ll_init : far
+    .import ll_insert_head : far
+    .import ll_insert_tail : far   
+    .import ll_get_head : far
+    .import ll_get_tail : far
+    .import ll_remove : far
+    ;.import ll_move_to_top : far
+    ;.import ll_move_to_bottom : far
+    ;.import ll_move_up : far
+    ;.import ll_move_down : far
+    .import ll_get_next : far
+    .import ll_get_prev : far
+    .import ll_is_empty : far
+    .import ll_get_count : far
+    .import ll_clear : far
+
+.endif
+
+.macro ll_node_contents
+    prev        .dword 
+    next        .dword
+    destructor  .dword  ; function pointer to destructor function that takes the node as parameter
+.endmacro
+
+.struct ll_node
+    ll_node_contents
+.endstruct
+
+.struct linkedlist
+    head        .dword 
+    tail        .dword 
+    count       .dword    
+.endstruct  
 
 .macro LL_Init list
     .out "LL_Init"        

@@ -2,11 +2,13 @@
 .A16
 .I16
 
+.scope
+.define current_file "panel.s"
+
 .include "mac.inc"
 .include "malloc.inc"
-.include "linkedlist_struct.inc"
 .include "linkedlist.inc"
-.include "panel_struct.inc"
+.include "panel.inc"
 
 ; Define exports for all public functions in this module
 .export panel_create
@@ -414,3 +416,5 @@
     ; Return from "near" procedure with "rts"; from "far" procedure with "rtl"
     rtl
 .endproc
+
+.endscope

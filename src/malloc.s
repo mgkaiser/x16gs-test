@@ -2,6 +2,9 @@
 .A16
 .I16
 
+.scope
+.define current_file "malloc.s"
+
 .include "mac.inc"
 .include "kernal.inc"
 .include "x16.inc"
@@ -1080,3 +1083,4 @@ farmalloc_item_insert_exit:
     sta variable + 2
 .endmacro
 
+.endscope
