@@ -57,6 +57,13 @@
 	pha
 .endmacro
 
+.macro DeclareLocalS lname, position, size
+	lname = (position * 2) + 1	
+	.repeat size
+		pla
+	.endrepeat
+.endmacro
+
 .macro DeclareLocalWithValue lname, value, position
 	lname = (position * 2) + 1	
 	lda value

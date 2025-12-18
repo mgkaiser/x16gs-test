@@ -728,9 +728,8 @@ l1:
             SetParamL *l_current
             jsl_ptr l_func
             FreeParams 2
-
-        ; Free the node
-l2:     FarFree *l_current  
+        
+l2:     ; endif
 
         ; if (current != null) goto l1;
         lda l_current

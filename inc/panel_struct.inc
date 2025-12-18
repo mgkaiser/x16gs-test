@@ -1,3 +1,10 @@
+.struct wi_bounds
+    xpos        .word   ; X position of the panel
+    ypos        .word   ; Y position of the panel
+    w           .word   ; Width of the panel
+    h           .word   ; Height of the panel    
+.endstruct
+
 .macro wi_panel_contents
     ; Parent
     parent      .dword  ; The panel which is the parent of this panel
