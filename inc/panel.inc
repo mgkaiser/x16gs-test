@@ -3,6 +3,7 @@
 .import panel_done : far
 .import panel_destroy : far
 .import panel_draw : far
+.import panel_get_bounds : far
 
 ; Panel_Create
 .macro Panel_Create xpos, ypos, w, h, character, retval
@@ -55,6 +56,31 @@
     SetParamL panel
     jsl panel_draw
     FreeParams 2
+.endmacro
+
+.macro Panel_Draw_Ptr panel, bounds_ptr, func_ptr
+    .out "Panel_Draw_Full"
+    SetParamL panel
+    SetParamL bounds_ptr
+    jsl_ptr func_ptr
+    FreeParams 3    
+.endmacro
+
+; Panel_Get_Bounds
+.macro Panel_Get_Bounds panel, bounds_ptr
+    .out "Panel_Get_Bounds"
+    SetParamL panel
+    SetParamL bounds_ptr
+    jsl panel_get_bounds
+    FreeParams 3
+.endmacro
+
+.macro Panel_Get_Bounds panel, bounds_ptr, func_ptr
+    .out "Panel_Get_Bounds"
+    SetParamL panel
+    SetParamL bounds_ptr
+    jsl_ptr func_ptr
+    FreeParams 3
 .endmacro
 
 

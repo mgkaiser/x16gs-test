@@ -14,6 +14,7 @@
 .export panel_done
 .export panel_destroy
 .export panel_draw
+.export panel_get_bounds
     
 .segment "OVERLAY1"
 
