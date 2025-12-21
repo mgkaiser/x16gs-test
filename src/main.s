@@ -70,8 +70,17 @@ BUFFER_SIZE         = 32
     DebugPrintHexLWithCR str_linked_list_count, l_temp, buffer
     DebugPrint #str_delimiter
 
-    FarMalloc #.sizeof(ll_node) + 8, l_p2
-    breakpoint    
+    FarMalloc #.sizeof(ll_node) + 8, l_p2    
+    lda l_p2
+    adc #.loword(.sizeof(ll_node))
+    sta l_temp
+    lda l_p2 + 1
+    adc #.hiword(.sizeof(ll_node))
+    sta l_temp + 1
+    ToHex #$0001, *l_temp
+    ldy #$0004
+    lda #$0000
+    sta [l_temp], y
     LL_InsertTail *l_p1, *l_p2
 
     .A16
@@ -85,6 +94,16 @@ BUFFER_SIZE         = 32
     DebugPrint #str_delimiter
 
     FarMalloc #.sizeof(ll_node) + 8, l_p3
+    lda l_p3
+    adc #.loword(.sizeof(ll_node))
+    sta l_temp
+    lda l_p3 + 1
+    adc #.hiword(.sizeof(ll_node))
+    sta l_temp + 1
+    ToHex #$0002, *l_temp
+    ldy #$0004
+    lda #$0000
+    sta [l_temp], y
     LL_InsertTail *l_p1, *l_p3
 
     .A16
@@ -98,6 +117,16 @@ BUFFER_SIZE         = 32
     DebugPrint #str_delimiter
 
     FarMalloc #.sizeof(ll_node) + 8, l_p4
+    lda l_p4
+    adc #.loword(.sizeof(ll_node))
+    sta l_temp
+    lda l_p4 + 1
+    adc #.hiword(.sizeof(ll_node))
+    sta l_temp + 1
+    ToHex #$0003, *l_temp
+    ldy #$0004
+    lda #$0000
+    sta [l_temp], y
     LL_InsertHead *l_p1, *l_p4
 
     .A16
@@ -109,6 +138,15 @@ BUFFER_SIZE         = 32
     StructElementToVarL l_p1, linkedlist::count, l_temp
     DebugPrintHexLWithCR str_linked_list_count, l_temp, buffer    
     DebugPrint #str_delimiter
+
+    LL_GetTail *l_p1, l_temp
+l1: DebugPrintHexLWithCR str_linked_list_elem, l_temp, buffer
+
+    LL_GetPrev *l_p1, *l_temp, l_temp
+
+    lda l_temp
+    ora l_temp + 2
+    bne l1
 
     ; Free the allocated block
     FarFree *l_p1            
@@ -138,6 +176,7 @@ overlay2_filename: .byte "X16GS-TEST.OV2.BIN", $00
 str_linked_list_head:   .byte "Linked List Head:  ", $00
 str_linked_list_tail:   .byte "Linked List Tail:  ", $00
 str_linked_list_count:  .byte "Linked List Count: ", $00 
+str_linked_list_elem:   .byte "Element: ", $00 
 str_delimiter:          .byte "------------------------", $0a, $00
 
 .endscope
