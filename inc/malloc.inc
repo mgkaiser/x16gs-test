@@ -7,12 +7,12 @@
 
 ; Define Macros to call these functions from assembly
 .macro FarMalloc_Init
-    .out "FarMalloc_Init"    
+    ;.out "FarMalloc_Init"    
     jsl farmalloc_init
 .endmacro
 
 .macro FarMalloc_AddBlock ptr, size
-    .out "FarMalloc_AddBlock"        
+    ;.out "FarMalloc_AddBlock"        
     SetParamL ptr
     SetParamL size    
     jsl farmalloc_addblock
@@ -20,7 +20,7 @@
 .endmacro
 
 .macro FarMalloc size, ptr
-    .out "FarMalloc"
+    ;.out "FarMalloc"
     SetRetValL        
     SetParamL size
     jsl farmalloc
@@ -31,7 +31,7 @@
 .endmacro
 
 .macro FarFree ptr
-    .out "FarFree"
+    ;.out "FarFree"
     SetParamL ptr
     jsl farfree
     FreeParams 2

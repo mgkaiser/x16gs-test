@@ -40,7 +40,7 @@
 
 ; Define macros to call all private functions in this module
 .macro FarMalloc_Item_Insert root, ptr  
-    .out "FarMalloc_Item_Insert"        
+    ;.out "FarMalloc_Item_Insert"        
     SetParamL f:root
     pei (ptr+2)
     pei (ptr)    
@@ -49,7 +49,7 @@
 .endmacro
 
 .macro FarMalloc_Item_Remove root, ptr  
-    .out "FarMalloc_Item_Remove"        
+    ;.out "FarMalloc_Item_Remove"        
     SetParamL f:root
     pei (ptr+2)
     pei (ptr)    
@@ -58,7 +58,7 @@
 .endmacro
 
 .macro FarMalloc_Merge node
-    .out "FarMalloc_Merge"        
+    ;.out "FarMalloc_Merge"        
     pei (node+2)
     pei (node)   
     jsl farmalloc_merge

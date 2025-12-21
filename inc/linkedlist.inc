@@ -36,7 +36,7 @@
 .endstruct  
 
 .macro LL_Init list
-    .out "LL_Init"        
+    ;.out "LL_Init"        
     SetParamL list
     jsl ll_init
     FreeParams 2
@@ -46,7 +46,7 @@
 ;; All nodes must be at least the size of ll_node
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .macro LL_InsertHead list, node
-    .out "LL_InsertHead"        
+    ;.out "LL_InsertHead"        
     SetParamL list
     SetParamL node
     jsl ll_insert_head
@@ -57,7 +57,7 @@
 ;; All nodes must be at least the size of ll_node
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .macro LL_InsertTail list, node
-    .out "LL_InsertTail"        
+    ;.out "LL_InsertTail"        
     SetParamL list
     SetParamL node
     jsl ll_insert_tail
@@ -68,7 +68,7 @@
 ;; This will NOT call the destructor nor free memory
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .macro LL_Remove list, node
-    .out "LL_Remove"    
+    ;.out "LL_Remove"    
     SetParamL list
     SetParamL node
     jsl ll_remove
@@ -76,7 +76,7 @@
 .endmacro
 
 .macro LL_GetHead list, retval
-    .out "LL_GetHead"
+    ;.out "LL_GetHead"
     SetRetValL        
     SetParamL list
     jsl ll_get_head
@@ -87,7 +87,7 @@
 .endmacro
 
 .macro LL_GetTail list, retval
-    .out "LL_GetTail"
+    ;.out "LL_GetTail"
     SetRetValL        
     SetParamL list
     jsl ll_get_tail
@@ -98,7 +98,7 @@
 .endmacro
 
 .macro LL_GetNext list, node, retval
-    .out "LL_GetNext"
+    ;.out "LL_GetNext"
     SetRetValL        
     SetParamL list
     SetParamL node
@@ -110,7 +110,7 @@
 .endmacro
 
 .macro LL_GetPrev list, node, retval
-    .out "LL_GetPrev"
+    ;.out "LL_GetPrev"
     SetRetValL        
     SetParamL list
     SetParamL node
@@ -122,7 +122,7 @@
 .endmacro
 
 .macro LL_IsEmpty list, retval
-    .out "LL_IsEmpty"
+    ;.out "LL_IsEmpty"
     SetRetValL        
     SetParamL list
     jsl ll_is_empty
@@ -133,7 +133,7 @@
 .endmacro
 
 .macro LL_GetCount list, retval
-    .out "LL_GetCount"
+    ;.out "LL_GetCount"
     SetRetValL        
     SetParamL list
     jsl ll_get_count
@@ -148,7 +148,7 @@
 ; or this will crash!
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .macro LL_Clear list
-    .out "LL_Clear"        
+    ;.out "LL_Clear"        
     SetParamL list
     jsl ll_clear
     FreeParams 2

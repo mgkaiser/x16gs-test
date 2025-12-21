@@ -141,38 +141,38 @@
 ; PEI = Pointer 			param is a DP address to be used as a pointer.  The value it points to is pushed on the stack
 .macro SetParam arg	
 	.if (.match (.left (1, {arg}), #))
-		.out "-- PEA --"
+		;.out "-- PEA --"
 		.byte $f4
 		.byte <(.right (.tcount ({arg})-1, {arg}))		
 		.byte >(.right (.tcount ({arg})-1, {arg}))		
 	.else
 		.if (.match (.left (1, {arg}), *))
-			.out "-- PEI --"
+			;.out "-- PEI --"
 			pei (.right (.tcount ({arg})-1, {arg}))
 		.else			
 			.if (.match (.left (2, {arg}), ^A))
-				.out "-- A --"
+				;.out "-- A --"
 				pha
 			.else
 				.if (.match (.left (2, {arg}), ^D))
-					.out "-- D --"					
+					;.out "-- D --"					
 					phd
 				.else
 					.if (.match (.left (2, {arg}), ^Y))
-						.out "-- Y --"					
+						;.out "-- Y --"					
 						phy
 					.else
 						.if (.match (.left (2, {arg}), ^X))
-							.out "-- X --"					
+							;.out "-- X --"					
 							phx
 						.else
 							.if (.match (.left (2, {arg}), ^^))
-								.out "-- ^^ --"
+								;.out "-- ^^ --"
 								.byte $a5	
 								.byte <(.right (.tcount ({arg})-2, {arg}))
 								pha
 							.else																																								
-								.out "-- PER --"
+								;.out "-- PER --"
 								per arg														
 							.endif												
 						.endif
@@ -184,7 +184,7 @@
 .endmacro
 
 .macro SetParamL arg
-	.out "-- f:PEA --"
+	;.out "-- f:PEA --"
 	.if (.match (.left (1, {arg}), #))
 		.byte $f4
 		.byte ^(.right (.tcount ({arg})-1, {arg}))
@@ -194,7 +194,7 @@
 		.byte >(.right (.tcount ({arg})-1, {arg}))
 	.else
 		.if (.match (.left (1, {arg}), *))
-			.out "-- PEI --"
+			;.out "-- PEI --"
 			lda .right (.tcount ({arg})-1, {arg}) + 2
 			pha
 			lda .right (.tcount ({arg})-1, {arg})
@@ -211,12 +211,12 @@
 .endmacro	
 
 .macro SetRetVal
-	.out "-- SetRetVal --"
+	;.out "-- SetRetVal --"
 	pha
 .endmacro
 
 .macro SetRetValL
-	.out "-- SetRetValL --"
+	;.out "-- SetRetValL --"
 	pha
 	pha
 .endmacro

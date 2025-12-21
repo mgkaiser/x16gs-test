@@ -1,7 +1,7 @@
 .import load: far
 
 .macro Load lfn, dev, snd, filename, address
-    .out "Load"        
+    ;.out "Load"        
     SetParam lfn    
     SetParam dev
     SetParam snd

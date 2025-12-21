@@ -64,7 +64,7 @@
 
 ; Panel_Create
 .macro Panel_Create xpos, ypos, w, h, character, retval
-    .out "Panel_Create"
+    ;.out "Panel_Create"
     SetRetValL    
     SetParam xpos
     SetParam ypos
@@ -80,7 +80,7 @@
 
 ; Panel_Init
 .macro Panel_Init panel, xpos, ypos, w, h, character, retval
-    .out "Panel_Create"    
+    ;.out "Panel_Create"    
     SetParamL panel
     SetParam xpos
     SetParam ypos
@@ -93,7 +93,7 @@
 
 ; Panel_Done
 .macro Panel_Done panel
-    .out "Panel_Done"    
+    ;.out "Panel_Done"    
     SetParamL panel
     jsl panel_done
     FreeParams 2
@@ -101,7 +101,7 @@
 
 ; Panel_Destroy
 .macro Panel_Destroy panel
-    .out "Panel_Destroy"    
+    ;.out "Panel_Destroy"    
     SetParamL panel
     jsl panel_destroy
     FreeParams 2
@@ -109,14 +109,14 @@
 
 ; Panel_Draw
 .macro Panel_Draw panel
-    .out "Panel_Draw"
+    ;.out "Panel_Draw"
     SetParamL panel
     jsl panel_draw
     FreeParams 2
 .endmacro
 
 .macro Panel_Draw_Ptr panel, bounds_ptr, func_ptr
-    .out "Panel_Draw_Full"
+    ;.out "Panel_Draw_Full"
     SetParamL panel
     SetParamL bounds_ptr
     jsl_ptr func_ptr
@@ -125,7 +125,7 @@
 
 ; Panel_Get_Bounds
 .macro Panel_Get_Bounds panel, bounds_ptr
-    .out "Panel_Get_Bounds"
+    ;.out "Panel_Get_Bounds"
     SetParamL panel
     SetParamL bounds_ptr
     jsl panel_get_bounds
@@ -133,7 +133,7 @@
 .endmacro
 
 .macro Panel_Get_Bounds_Ptr panel, bounds_ptr, func_ptr
-    .out "Panel_Get_Bounds"
+    ;.out "Panel_Get_Bounds"
     SetParamL panel
     SetParamL bounds_ptr
     jsl_ptr func_ptr
