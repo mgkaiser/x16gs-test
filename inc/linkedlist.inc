@@ -42,6 +42,9 @@
     FreeParams 2
 .endmacro
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; All nodes must be at least the size of ll_node
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .macro LL_InsertHead list, node
     .out "LL_InsertHead"        
     SetParamL list
@@ -50,6 +53,9 @@
     FreeParams 4
 .endmacro
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; All nodes must be at least the size of ll_node
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .macro LL_InsertTail list, node
     .out "LL_InsertTail"        
     SetParamL list
@@ -58,6 +64,9 @@
     FreeParams 4
 .endmacro
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; This will NOT call the destructor nor free memory
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .macro LL_Remove list, node
     .out "LL_Remove"    
     SetParamL list
@@ -134,6 +143,10 @@
     stx retval + 2
 .endmacro
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; WARNING: All nodes must have a valid destructor or destructor must be set to NULL 
+; or this will crash!
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .macro LL_Clear list
     .out "LL_Clear"        
     SetParamL list

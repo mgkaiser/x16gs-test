@@ -387,6 +387,25 @@ l11: ;else
 
 l12: ;endif
 
+    ; if list->count <=  0 goto LL_Remove_Exit   
+    ldy #linkedlist::count
+    lda [list],y
+    bmi LL_Remove_Exit
+    ldy #linkedlist::count+2
+    ora [list],y
+    beq LL_Remove_Exit
+
+    ; Decrement the node count
+    sec
+    ldy #linkedlist::count
+    lda [list],y    
+    sbc #$0001
+    sta [list],y
+    ldy #linkedlist::count+2
+    lda [list],y
+    sbc #$0000
+    sta [list],y
+
 LL_Remove_Exit:
 
     ; Exit the procedure
@@ -682,36 +701,27 @@ LL_GetCount_Exit:
     ora [list],y
     beq LL_Clear_Exit
 
+    ; l_current = list->head;
+    ldy #linkedlist::head
+    lda [list],y
+    sta l_current
+    ldy #linkedlist::head+2
+    lda [list],y
+    sta l_current+2
+
     ; while (l_current != NULL)
 l1:
-
-        ; l_current = list->head;
-        ldy #linkedlist::head
-        lda [list],y
-        sta l_current
-        ldy #linkedlist::head+2
-        lda [list],y
-        sta l_current+2
-
+        
         ; l_next = l_current->next;
         ldy #ll_node::next
         lda [l_current],y
         sta l_next
         ldy #ll_node::next+2
         lda [l_current],y
-        sta l_next+2
+        sta l_next+2        
 
-        ;current = next;
-        lda l_next
-        sta l_current
-        lda l_next+2
-        sta l_current+2
-
-        ; ll_remove(list, node);
-        SetParamL *list
-        SetParamL *l_current
-        jsl ll_remove
-        FreeParams 4         
+        ; ll_remove(list, node);        
+        LL_Remove *list, *l_current        
 
         ; if node->ll_node::destructor == null goto l2;
         ldy #ll_node::destructor
@@ -728,12 +738,26 @@ l1:
             lda [l_current],y
             sta l_func+2
 
+            ; if l_func == null goto l2;
+            lda l_func
+            ora l_func+2
+            beq l2
+            
             ; Call destructor function            
             SetParamL *l_current
             jsl_ptr l_func
             FreeParams 2
         
 l2:     ; endif
+
+        ; Free the memory
+        FarFree *l_current
+
+        ;current = next;
+        lda l_next
+        sta l_current
+        lda l_next+2
+        sta l_current+2
 
         ; if (current != null) goto l1;
         lda l_current

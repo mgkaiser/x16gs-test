@@ -444,7 +444,7 @@ farmalloc_exit:
     DeclareParam ptr, 0                                     ; uint32_t ptr                                 
 
     ; Setup stack frame
-    SetupStackFrame      
+    SetupStackFrame       
 
     ;if (ptr == NULL) return;
     lda ptr
