@@ -77,8 +77,8 @@
     SetLocalCount 2                                         ; Number of (16 bit) local variables declared                   
 
     ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
-    DeclareParam node, 2                                     ; uint32_t ptr
-    DeclareParam list, 0                                     ; uint32_t ptr
+    DeclareParam node, 0                                     ; uint32_t ptr
+    DeclareParam list, 2                                     ; uint32_t ptr
 
     ; Setup stack frame
     SetupStackFrame    
@@ -99,6 +99,7 @@
     ldy #linkedlist::head+2
     lda [list],y
     ldy #ll_node::next+2        
+    sta [node],y
 
     ; node->prev = NULL;
     ldy #ll_node::prev
@@ -187,8 +188,8 @@ LL_InsertHead_Exit:
     SetLocalCount 2                                         ; Number of (16 bit) local variables declared                   
 
     ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
-    DeclareParam node, 2                                     ; uint32_t ptr
-    DeclareParam list, 0                                     ; uint32_t ptr
+    DeclareParam node, 0                                     ; uint32_t ptr
+    DeclareParam list, 2                                     ; uint32_t ptr
 
     ; Setup stack frame
     SetupStackFrame    
@@ -202,9 +203,9 @@ LL_InsertHead_Exit:
     beql LL_InsertTail_Exit  
 
     ; Add node to the end of the list
-    ; node->next = NULL;
-    ldy #ll_node::next
+    ; node->next = NULL;    
     lda #$0000
+    ldy #ll_node::next
     sta [node],y
     ldy #ll_node::next+2
     sta [node],y        
@@ -217,6 +218,7 @@ LL_InsertHead_Exit:
     ldy #linkedlist::tail+2
     lda [list],y
     ldy #ll_node::prev+2        
+    sta [node],y
     
     ; if (list->tail == NULL)   
     ldy #linkedlist::tail
@@ -267,9 +269,9 @@ l1: ; list->tail = node;
         sta [list],y        
 
 l2: ; Increment the node count
-    ldy #linkedlist::count
-    lda [list],y
     clc
+    ldy #linkedlist::count
+    lda [list],y    
     adc #$0001
     sta [list],y
     ldy #linkedlist::count+2
@@ -297,9 +299,8 @@ LL_InsertTail_Exit:
     SetLocalCount 2                                         ; Number of (16 bit) local variables declared                   
 
     ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
-    DeclareParam node, 0                                    ; uint32_t    
-    DeclareParam list, 2                                    ; uint32_t                                  
-    DeclareParam r_retVal, 4                                ; uint32_t 
+    DeclareParam node, 0                                     ; uint32_t ptr
+    DeclareParam list, 2                                     ; uint32_t ptr
 
     ; Setup stack frame
     SetupStackFrame   

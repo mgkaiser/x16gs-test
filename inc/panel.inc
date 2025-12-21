@@ -28,17 +28,28 @@
     children    .dword  ; Linked list of child panels
     application .dword  ; Pointer to the application this panel belongs to
 
-    ; Panel specific function pointers
-    draw        .dword  ; Function pointer to the draw function for this panel
-    insert      .dword  ; Function pointer to the insert function for this panel
-    getbounds   .dword  ; Function pointer to the getbounds function for this panel
-    doevents    .dword  ; Function pointer to the doevents function for this panel
-    mousemove   .dword  ; Function pointer to the mousemove function for this panel
-    mouseup     .dword  ; Function pointer to the mouseup function for this panel
-    mousedown   .dword  ; Function pointer to the mousedown function for this panel
-    gotfocus    .dword  ; Function pointer to the gotfocus function for this panel
-    lostfocus   .dword  ; Function pointer to the lostfocus function for this panel
-    clicked     .dword  ; Function pointer to the clicked function for this panel
+    ; Panel specific function pointers - All virtual functions have a base_ version which is the default implementation
+    ; and a normal version which is the current implementation (which may be overridden)
+    base_draw       .dword  ; Function pointer to the draw function for this panel
+    draw            .dword  ; Function pointer to the draw function for this panel
+    base_insert     .dword  ; Function pointer to the insert function for this panel
+    insert          .dword  ; Function pointer to the insert function for this panel
+    base_getbounds  .dword  ; Function pointer to the getbounds function for this panel
+    getbounds       .dword  ; Function pointer to the getbounds function for this panel
+    base_doevents   .dword  ; Function pointer to the doevents function for this panel
+    doevents        .dword  ; Function pointer to the doevents function for this panel
+    base_mousemove  .dword  ; Function pointer to the mousemove function for this panel
+    mousemove       .dword  ; Function pointer to the mousemove function for this panel
+    base_mouseup    .dword  ; Function pointer to the mouseup function for this panel
+    mouseup         .dword  ; Function pointer to the mouseup function for this panel
+    base_mousedown  .dword  ; Function pointer to the mousedown function for this panel
+    mousedown       .dword  ; Function pointer to the mousedown function for this panel
+    base_gotfocus   .dword  ; Function pointer to the gotfocus function for this panel
+    gotfocus        .dword  ; Function pointer to the gotfocus function for this panel
+    base_lostfocus  .dword  ; Function pointer to the lostfocus function for this panel
+    lostfocus       .dword  ; Function pointer to the lostfocus function for this panel
+    base_clicked    .dword  ; Function pointer to the clicked function for this panel
+    clicked         .dword  ; Function pointer to the clicked function for this panel
 .endmacro
 
 .struct wi_panel

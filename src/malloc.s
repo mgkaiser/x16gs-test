@@ -1073,14 +1073,4 @@ farmalloc_item_insert_exit:
 
 .endproc
 
-.macro StructElementToVar struc, elem, variable    
-    ; Load the element value
-    ldy #elem
-    lda (struc),y
-    sta variable
-    ldy #elem + 2
-    lda (struc),y
-    sta variable + 2
-.endmacro
-
 .endscope

@@ -33,10 +33,13 @@ BUFFER_SIZE         = 32
     ProcPrefix 
     ProcNear                                                ; This is "near" if called with "jsr" and "far" if called with "jsl"     
 
-    ; Create local variable - Number in descending order, skip 2 for long parameters    
+    ; Create local variable - Number in descending order, skip 2 for long parameters        
+    DeclareLocalL l_p4, 8                                   ; This is a uint32_t local variable
+    DeclareLocalL l_p3, 6                                   ; This is a uint32_t local variable
+    DeclareLocalL l_p2, 4                                   ; This is a uint32_t local variable
     DeclareLocalL l_p1, 2                                   ; This is a uint32_t local variable
     DeclareLocalL l_temp, 0                                 ; This is a uint32_t local variable
-    SetLocalCount 4                                         ; Number of (16 bit) local variables declared                   
+    SetLocalCount 10                                         ; Number of (16 bit) local variables declared                   
 
     ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
 
@@ -54,8 +57,58 @@ BUFFER_SIZE         = 32
     ; Allocate and free a memory block
     FarMalloc #.sizeof(linkedlist), l_p1        
 
-    ; Initialize linked list        
+    ; Initialize linked list 
     LL_Init *l_p1   
+
+    .A16
+    .I16
+    StructElementToVarL l_p1, linkedlist::head, l_temp
+    DebugPrintHexLWithCR str_linked_list_head, l_temp, buffer
+    StructElementToVarL l_p1, linkedlist::tail, l_temp
+    DebugPrintHexLWithCR str_linked_list_tail, l_temp, buffer
+    StructElementToVarL l_p1, linkedlist::count, l_temp
+    DebugPrintHexLWithCR str_linked_list_count, l_temp, buffer
+    DebugPrint #str_delimiter
+
+    FarMalloc #.sizeof(ll_node) + 8, l_p2
+    breakpoint    
+    LL_InsertTail *l_p1, *l_p2
+
+    .A16
+    .I16
+    StructElementToVarL l_p1, linkedlist::head, l_temp
+    DebugPrintHexLWithCR str_linked_list_head, l_temp, buffer
+    StructElementToVarL l_p1, linkedlist::tail, l_temp
+    DebugPrintHexLWithCR str_linked_list_tail, l_temp, buffer
+    StructElementToVarL l_p1, linkedlist::count, l_temp
+    DebugPrintHexLWithCR str_linked_list_count, l_temp, buffer
+    DebugPrint #str_delimiter
+
+    FarMalloc #.sizeof(ll_node) + 8, l_p3
+    LL_InsertTail *l_p1, *l_p3
+
+    .A16
+    .I16
+    StructElementToVarL l_p1, linkedlist::head, l_temp
+    DebugPrintHexLWithCR str_linked_list_head, l_temp, buffer
+    StructElementToVarL l_p1, linkedlist::tail, l_temp
+    DebugPrintHexLWithCR str_linked_list_tail, l_temp, buffer
+    StructElementToVarL l_p1, linkedlist::count, l_temp
+    DebugPrintHexLWithCR str_linked_list_count, l_temp, buffer    
+    DebugPrint #str_delimiter
+
+    FarMalloc #.sizeof(ll_node) + 8, l_p4
+    LL_InsertHead *l_p1, *l_p4
+
+    .A16
+    .I16
+    StructElementToVarL l_p1, linkedlist::head, l_temp
+    DebugPrintHexLWithCR str_linked_list_head, l_temp, buffer
+    StructElementToVarL l_p1, linkedlist::tail, l_temp
+    DebugPrintHexLWithCR str_linked_list_tail, l_temp, buffer
+    StructElementToVarL l_p1, linkedlist::count, l_temp
+    DebugPrintHexLWithCR str_linked_list_count, l_temp, buffer    
+    DebugPrint #str_delimiter
 
     ; Free the allocated block
     FarFree *l_p1            
@@ -81,5 +134,10 @@ buffer:
 ; String Constants
 overlay1_filename: .byte "X16GS-TEST.OV1.BIN", $00
 overlay2_filename: .byte "X16GS-TEST.OV2.BIN", $00
+
+str_linked_list_head:   .byte "Linked List Head:  ", $00
+str_linked_list_tail:   .byte "Linked List Tail:  ", $00
+str_linked_list_count:  .byte "Linked List Count: ", $00 
+str_delimiter:          .byte "------------------------", $0a, $00
 
 .endscope

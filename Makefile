@@ -32,7 +32,7 @@ OVERLAY2_ROOT = x16gs-test.ov2
 MAIN_SOURCES = src/main.s src/malloc.s src/kernal.s src/file.s src/print.s src/linkedlist.s src/panel.s
 
 # Define output binaries
-MAIN_BIN = $(BUILD_DIR)/$(MAIN_ROOT).bin
+MAIN_BIN = $(BUILD_DIR)/$(MAIN_ROOT).prg
 
 # Define object files
 MAIN_OBJS = $(addprefix $(BUILD_DIR)/, $(MAIN_SOURCES:.s=.o))
@@ -47,7 +47,7 @@ all: $(MAIN_BIN)
 
 # Install target
 install: all	
-	cp $(MAIN_BIN) $(EMU_DIR1)/$(MAIN_ROOT).bin
+	cp $(MAIN_BIN) $(EMU_DIR1)/$(MAIN_ROOT).prg
 	cp $(BUILD_DIR)/$(OVERLAY1_ROOT).bin $(EMU_DIR1)/$(OVERLAY1_ROOT).bin
 	cp $(BUILD_DIR)/$(OVERLAY2_ROOT).bin $(EMU_DIR1)/$(OVERLAY2_ROOT).bin
 
@@ -58,7 +58,7 @@ test: install
 # Clean target
 clean:
 	rm -rf $(BUILD_DIR)
-	rm -rf $(EMU_DIR1)/$(MAIN_ROOT).bin
+	rm -rf $(EMU_DIR1)/$(MAIN_BIN)
 	rm -rf $(EMU_DIR1)/$(OVERLAY1_ROOT).bin
 	rm -rf $(EMU_DIR1)/$(OVERLAY2_ROOT).bin
 
@@ -77,4 +77,4 @@ $(BUILD_DIR)/%.o: %.s
 # Link main program
 $(MAIN_BIN): $(MAIN_OBJS) $(MAIN_CFG) 
 	@mkdir -p $$(dirname $@)
-	$(LD) -C $(MAIN_CFG) $(MAIN_OBJS) -o $@ -m $(BUILD_DIR)/$(MAIN_ROOT).map -Ln $(BUILD_DIR)/$(MAIN_ROOT).sym
+	$(LD) -C $(MAIN_CFG) $(MAIN_OBJS) -o $@ -m $(BUILD_DIR)/$(MAIN_ROOT).map -Ln $(BUILD_DIR)/$(MAIN_ROOT).sym 

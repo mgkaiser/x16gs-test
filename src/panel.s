@@ -6,6 +6,7 @@
 .define current_file "panel.s"
 
 .include "mac.inc"
+.include "x16.inc"
 .include "malloc.inc"
 .include "linkedlist.inc"
 .include "panel.inc"
@@ -75,7 +76,18 @@
     DeclareParam panel, 5                                   ; This is a uint32_t parameter
 
     ; Setup stack frame
-    SetupStackFrame     
+    SetupStackFrame 
+
+    ; Clear the entire panel structure to $00
+    modea8x16
+    ldx #.sizeof(wi_panel)
+    ldy #$0000
+    lda #$00
+:   sta [panel], y
+    iny
+    dex
+    bne :-
+    mode16
     
     ; panel->xpos = xpos;
     ldy #wi_panel::xpos
@@ -206,10 +218,11 @@
     ProcFar                                                 ; This is "near" if called with "jsr" and "far" if called with "jsl"     
     
     ; Create local variable - Number in descending order, skip 2 for long parameters 
-    DeclareLocalL l_p_func, 9                               ; This is a uint32_t local variable       
+    DeclareLocalL l_p_func, 10                              ; This is a uint32_t local variable       
+    DeclareLocal l_temp, 9                                  ; This is a uint16_t local variable        
     DeclareLocal l_DP, 8                                    ; This is a uint16_t local variable        
     DeclareLocalS l_bounds, 0, .sizeof(wi_bounds)/2         ; This is a wi_bounds local variable
-    SetLocalCount 11                                        ; Number of (16 bit) local variables declared                   
+    SetLocalCount 12                                        ; Number of (16 bit) local variables declared                   
 
     ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
     DeclareParam panel, 0                                   ; This is a uint32_t parameter
@@ -239,6 +252,81 @@
     pla   
     pla
     pla 
+
+    ; Set VERA to use dc0
+    mode8
+    lda #vera_dcsel::VERA_DCSEL0
+    sta f:VERA_BASE+vera::control
+    mode16
+
+    ; Set the address
+
+    ; l_temp = $b000
+    lda #$b000
+    sta l_temp  
+
+    ; y_register = lbounds.ypos + lbounds.h
+    clc
+    lda l_bounds + wi_bounds::ypos
+    adc l_bounds + wi_bounds::h
+    tay 
+
+top_of_y_loop:       
+    
+        ; l_temp = (bounds.xpos * 2)    
+        lda l_bounds + wi_bounds::xpos
+        asl
+        clc
+        adc l_temp
+        sta l_temp
+
+        ; l_temp = l_temp + (y_register * 256)
+        tya
+        and #$00ff
+        xba
+        clc
+        adc l_temp
+        sta l_temp
+
+        ; Store the address
+        mode8
+        lda l_temp
+        sta f:VERA_BASE+vera::address
+        lda #vera_step::VERA_INC_1
+        inc
+        sta f:VERA_BASE+vera::address_hi 
+        mode16
+
+top_of_x_loop:
+
+            ; x_register = lbounds.xpos + lbounds.y
+            clc
+            lda l_bounds + wi_bounds::ypos
+            adc l_bounds + wi_bounds::h
+            tay 
+
+            ; Get the character and color from panel and write it to VERA
+            phy
+            ldy #wi_panel::character
+            lda [panel], y
+            mode8
+            sta f:VERA_BASE+vera::data0
+            xba
+            sta f:VERA_BASE+vera::data0
+            mode16
+            ply
+            
+            ; Next x
+            dex
+            bne top_of_x_loop
+
+        ; end of x loop
+
+        ; Next y
+        dey
+        bne top_of_y_loop
+
+    ;end of y loop
 
     ; Do the draw here
 

@@ -4,9 +4,9 @@
     .import ll_init : far
     .import ll_insert_head : far
     .import ll_insert_tail : far   
+    .import ll_remove : far    
     .import ll_get_head : far
     .import ll_get_tail : far
-    .import ll_remove : far
     ;.import ll_move_to_top : far
     ;.import ll_move_to_bottom : far
     ;.import ll_move_up : far
@@ -58,6 +58,14 @@
     FreeParams 4
 .endmacro
 
+.macro LL_Remove list, node
+    .out "LL_Remove"    
+    SetParamL list
+    SetParamL node
+    jsl ll_remove
+    FreeParams 4    
+.endmacro
+
 .macro LL_GetHead list, retval
     .out "LL_GetHead"
     SetRetValL        
@@ -67,14 +75,6 @@
     GetRetValL          ; RetVal lands in A-LoWord, X-HiWord
     sta retval
     stx retval + 2
-.endmacro
-
-.macro LL_Remove list, node
-    .out "LL_Remove"    
-    SetParamL list
-    SetParamL node
-    jsl ll_remove
-    FreeParams 4    
 .endmacro
 
 .macro LL_GetTail list, retval
