@@ -42,14 +42,7 @@
 
     ; Create and init the panel structure
     FarMalloc #.sizeof(wi_panel), r_retVal              
-    SetParamL *r_retVal
-    SetParam *xpos
-    SetParam *ypos
-    SetParam *w
-    SetParam *h
-    SetParam *character
-    jsl panel_init
-    FreeParams 7  
+    Panel_Init *r_retVal, *xpos, *ypos, *w, *h, *character            
     
     ; Exit the procedure
     FreeLocals
@@ -79,15 +72,7 @@
     SetupStackFrame 
 
     ; Clear the entire panel structure to $00
-    modea8x16
-    ldx #.sizeof(wi_panel)
-    ldy #$0000
-    lda #$00
-:   sta [panel], y
-    iny
-    dex
-    bne :-
-    mode16
+    ClearStruct panel, wi_panel    
     
     ; panel->xpos = xpos;
     ldy #wi_panel::xpos

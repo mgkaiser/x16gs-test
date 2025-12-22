@@ -7,6 +7,7 @@
 .include "kernal.inc"
 .include "x16.inc"
 .include "linkedlist.inc"
+.include "application.inc"
 .include "panel.inc"
 .include "desktop.inc"
 .include "malloc.inc"
@@ -33,13 +34,10 @@ BUFFER_SIZE         = 32
     ProcPrefix 
     ProcNear                                                ; This is "near" if called with "jsr" and "far" if called with "jsl"     
 
-    ; Create local variable - Number in descending order, skip 2 for long parameters        
-    DeclareLocalL l_p4, 8                                   ; This is a uint32_t local variable
-    DeclareLocalL l_p3, 6                                   ; This is a uint32_t local variable
-    DeclareLocalL l_p2, 4                                   ; This is a uint32_t local variable
-    DeclareLocalL l_p1, 2                                   ; This is a uint32_t local variable
+    ; Create local variable - Number in descending order, skip 2 for long parameters            
+    DeclareLocalL application, 2                            ; This is a uint32_t local variable
     DeclareLocalL l_temp, 0                                 ; This is a uint32_t local variable
-    SetLocalCount 10                                         ; Number of (16 bit) local variables declared                   
+    SetLocalCount 4                                         ; Number of (16 bit) local variables declared                   
 
     ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
 
@@ -54,7 +52,11 @@ BUFFER_SIZE         = 32
     FarMalloc_Init    
     FarMalloc_AddBlock #MALLOC_START, #MALLOC_SIZE	        
 
-              
+    ; Initialize the applcation    
+    Application_Create #$6661, application    
+
+    ; Free the application
+    Application_Destroy *application          
 
     ; Exit the procedure
     FreeLocals

@@ -79,7 +79,7 @@
 .endmacro
 
 ; Panel_Init
-.macro Panel_Init panel, xpos, ypos, w, h, character, retval
+.macro Panel_Init panel, xpos, ypos, w, h, character
     ;.out "Panel_Create"    
     SetParamL panel
     SetParam xpos

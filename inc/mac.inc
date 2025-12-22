@@ -344,3 +344,35 @@
     sta variable + 2
 .endmacro
 
+.macro VarToStructElement variable, struc, elem
+	ldy #elem
+	lda variable
+	sta (struc),y
+	ldy #elem + 2
+	lda variable + 2
+	sta (struc),y
+.endmacro
+
+.macro VarToStructElementL variable, struc, elem    
+	ldy #elem
+	lda variable
+	sta [struc],y
+	ldy #elem + 2
+	lda variable + 2
+	sta [struc],y
+.endmacro
+
+.macro ClearStruct obj, struct
+	modea8x16
+    ldx #.sizeof(struct)
+    ldy #$0000
+    lda #$00
+:   sta [obj], y
+    iny
+    dex
+    bne :-
+    mode16
+.endmacro
+
+
+
