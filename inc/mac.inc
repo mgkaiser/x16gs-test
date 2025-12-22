@@ -304,6 +304,26 @@
 	@:
 .endmacro
 
+.macro jsl_obj obj, method
+	phk				; Push the return bank on the stack
+	per @+-1		; Push the return address on the stack
+
+	mode8			; Push the bank we are JSLing to onto the stack
+	ldy #method+2
+	lda [obj],y
+	pha
+	mode16			
+
+	ldy #method		; Push the address we are JSLing to onto the stack
+	lda [obj],y
+	pha
+
+	rtl				; Return to the JSL target
+	
+	@:				; And when the method does RTL, we return here
+.endmacro
+
+
 .macro StructElementToVar struc, elem, variable    
     ; Load the element value
     ldy #elem

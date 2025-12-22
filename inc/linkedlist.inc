@@ -153,3 +153,12 @@
     jsl ll_clear
     FreeParams 2
 .endmacro
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Calls the destructor method of the ll_node pointed to by l_current
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.macro LL_NodeDestructor l_current
+    SetParamL *l_current
+    jsl_obj l_current, ll_node::destructor
+    FreeParams 2
+.endmacro

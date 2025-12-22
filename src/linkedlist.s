@@ -677,11 +677,10 @@ LL_GetCount_Exit:
     ProcPrefix
     ProcFar
 
-    ; Create local variable - Number in descending order, skip 2 for long parameters    
-    DeclareLocalL l_func, 4                                 ; This is a uint32_t local variable
+    ; Create local variable - Number in descending order, skip 2 for long parameters        
     DeclareLocalL l_next, 2                                 ; This is a uint32_t local variable
     DeclareLocalL l_current, 0                              ; This is a uint32_t local variable
-    SetLocalCount 6                                         ; Number of (16 bit) local variables declared                   
+    SetLocalCount 4                                         ; Number of (16 bit) local variables declared                   
 
     ; Declare parameters - reverse order of the called parameters, skip 2 for long parameters    
     DeclareParam list, 0                                    ; uint32_t                                  
@@ -699,7 +698,7 @@ LL_GetCount_Exit:
     lda [list],y
     ldy #linkedlist::head+2
     ora [list],y
-    beq LL_Clear_Exit
+    beql LL_Clear_Exit
 
     ; l_current = list->head;
     ldy #linkedlist::head
@@ -728,25 +727,10 @@ l1:
         lda [l_current],y
         ldy #ll_node::destructor+2
         ora [l_current],y
-        beq l2
-
-            ; l_func = node->ll_node::destructor;
-            ldy #ll_node::destructor
-            lda [l_current],y
-            sta l_func
-            ldy #ll_node::destructor+2
-            lda [l_current],y
-            sta l_func+2
-
-            ; if l_func == null goto l2;
-            lda l_func
-            ora l_func+2
-            beq l2
+        beq l2                        
             
-            ; Call destructor function            
-            SetParamL *l_current
-            jsl_ptr l_func
-            FreeParams 2
+            ; Call destructor function 
+            LL_NodeDestructor l_current                       
         
 l2:     ; endif
 
