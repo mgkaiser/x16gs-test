@@ -12,16 +12,27 @@
 .endif
 
 .macro wi_application_contents
+
+    ; Application specific contents
     desktop                 .dword
     eventqueue              .dword
     last_mouse_button       .byte
     last_mouse_x            .word 
     last_mouse_y            .word
-    run                     .dword  
-    insert                  .dword
-    postmessage             .dword
-    bringfront              .dword
-    invaidate               .dword
+    application_done        .word   ; Boolean flag to indicate application is done      
+
+    ; Function pointers - All virtual functions have a base_ version which is the default implementation
+    ; and a normal version which is the current implementation (which may be overridden)
+    base_run                .dword  
+    run                     .dword      
+    base_insert             .dword
+    insert                  .dword    
+    base_postmessage        .dword
+    postmessage             .dword    
+    base_bringfront         .dword
+    bringfront              .dword    
+    base_invaidate          .dword
+    invaidate               .dword    
 .endmacro
 
 .struct wi_application
@@ -58,5 +69,11 @@
 .macro Application_Destroy application    
     SetParamL application
     jsl application_destroy
+    FreeParams 2
+.endmacro
+
+.macro Application_Run application
+    SetParamL *application
+    jsl_obj application, wi_application::run
     FreeParams 2
 .endmacro

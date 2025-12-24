@@ -8,6 +8,8 @@
     .import open_far: far
     .import clrchn_far: far
     .import close_far: far
+    .import mouse_config: far
+    .import mouse_get: far
 .endif
 
 ; Define a structure to hold CPU register states
@@ -15,6 +17,7 @@
     a_reg       .word 
     x_reg       .word
     y_reg       .word  
+    flags       .word
     kernal_call .word
 .endstruct
 

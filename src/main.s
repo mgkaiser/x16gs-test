@@ -55,6 +55,10 @@ BUFFER_SIZE         = 32
     ; Initialize the applcation    
     Application_Create #$6661, application    
 
+    ; Run the application main loop
+    breakpoint
+    Application_Run application
+
     ; Free the application
     Application_Destroy *application          
 
